@@ -3,9 +3,14 @@ import os
 
 app = Flask(__name__)
 
-# Upload folder config
+# ---------------- CONFIG ----------------
+
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# create uploads folder if not exists
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
 # ---------------- LOGIN ----------------
 
@@ -18,6 +23,17 @@ def handle_login():
     role = request.form.get('role')
     user_id = request.form.get('user_id')
 
+    print("LOGIN:", role, user_id)
+
+    # external → no credentials needed
+    if role == 'external':
+        return redirect(url_for('external'))
+
+    # if no ID entered, give default (for testing)
+    if not user_id:
+        user_id = "guest"
+
+    # redirect based on role
     if role == 'admin':
         return redirect(url_for('admin'))
 
@@ -27,8 +43,7 @@ def handle_login():
     elif role == 'patient':
         return redirect(url_for('patient', patient_id=user_id))
 
-    else:
-        return redirect(url_for('external'))
+    return "Invalid role ❌"
 
 # ---------------- DASHBOARDS ----------------
 
@@ -46,6 +61,8 @@ def doctor(doctor_id):
         if len(parts) >= 2 and parts[1] == doctor_id:
             doctor_files.append(f)
 
+    print("Doctor:", doctor_id, "Files:", doctor_files)
+
     return render_template('doctor_dashboard.html', files=doctor_files, doctor_id=doctor_id)
 
 @app.route('/patient/<patient_id>')
@@ -57,9 +74,7 @@ def patient(patient_id):
         if f.startswith(patient_id + "_"):
             patient_files.append(f)
 
-    print("Patient ID:", patient_id)
-    print("All files:", files)
-    print("Filtered files:", patient_files)
+    print("Patient:", patient_id, "Files:", patient_files)
 
     return render_template('patient_dashboard.html', files=patient_files, patient_id=patient_id)
 
@@ -72,7 +87,7 @@ def external():
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
     if request.method == 'POST':
-        file = request.files['file']
+        file = request.files.get('file')
         patient_id = request.form.get('patient_id')
         doctor_id = request.form.get('doctor_id')
 
@@ -81,17 +96,19 @@ def upload():
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
 
-            return "File uploaded successfully!"
+            return "File uploaded successfully! ✅"
+
+        return "Missing data ❌"
 
     return render_template('upload.html')
 
-# ---------------- DOWNLOAD FILE ----------------
+# ---------------- DOWNLOAD ----------------
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory('uploads', filename)
 
-# ---------------- OTHER PAGES ----------------
+# ---------------- OTHER ----------------
 
 @app.route('/doctors')
 def doctors():

@@ -6,7 +6,7 @@
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(to right, #B2E0B2, #8CCB8C);
+            background: linear-gradient(to right, #E8F5E9, #A5D6A7);
             height: 100vh;
             margin: 0;
             display: flex;
@@ -14,44 +14,30 @@
             align-items: center;
         }
 
-        .login-container {
+        .container {
             background: white;
-            padding: 35px;
+            padding: 30px;
             border-radius: 15px;
-            width: 360px;
+            width: 380px;
             box-shadow: 0px 6px 20px rgba(0,0,0,0.15);
         }
 
         h2 {
             text-align: center;
-            color: #5DAA5D;
-            margin-bottom: 10px;
-        }
-
-        p.subtitle {
-            text-align: center;
-            color: #555;
-            margin-bottom: 20px;
-            font-size: 14px;
+            color: #2E7D32;
         }
 
         label {
             font-weight: 600;
-            color: #2A6A2A;
+            color: #2E7D32;
         }
 
         input, select {
             width: 100%;
             padding: 10px;
-            margin-top: 5px;
-            margin-bottom: 15px;
+            margin: 8px 0 15px 0;
             border-radius: 8px;
             border: 1px solid #ccc;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #66BB6A;
         }
 
         button {
@@ -60,44 +46,108 @@
             background: #66BB6A;
             border: none;
             color: white;
-            font-size: 16px;
             border-radius: 8px;
             cursor: pointer;
-            transition: 0.3s;
         }
 
         button:hover {
             background: #388E3C;
         }
-
     </style>
+
+    <script>
+        function updateForm() {
+            let role = document.getElementById("role").value;
+
+            document.getElementById("patientFields").style.display = "none";
+            document.getElementById("doctorFields").style.display = "none";
+            document.getElementById("adminFields").style.display = "none";
+            document.getElementById("externalMsg").style.display = "none";
+
+            if (role === "patient") {
+                document.getElementById("patientFields").style.display = "block";
+            }
+            else if (role === "doctor") {
+                document.getElementById("doctorFields").style.display = "block";
+            }
+            else if (role === "admin") {
+                document.getElementById("adminFields").style.display = "block";
+            }
+            else {
+                document.getElementById("externalMsg").style.display = "block";
+            }
+        }
+    </script>
 
 </head>
 <body>
 
-<div class="login-container">
+<div class="container">
 
     <h2>Hospital Login</h2>
-    <p class="subtitle">Secure Medical Records System</p>
 
     <form method="POST" action="/login">
 
-        <label>Phone Number</label>
-        <input type="tel" name="phone" placeholder="Enter phone number">
-
-        <label>User ID</label>
-        <input type="text" name="user_id" required>
-
-        <label>Password</label>
-        <input type="password" name="password">
-
-        <label>Login As</label>
-        <select name="role">
+        <label>Select Role</label>
+        <select name="role" id="role" onchange="updateForm()" required>
+            <option value="">-- Select --</option>
             <option value="admin">Admin</option>
             <option value="doctor">Doctor</option>
             <option value="patient">Patient</option>
             <option value="external">External</option>
         </select>
+
+        <!-- PATIENT -->
+        <div id="patientFields" style="display:none;">
+            <label>Username</label>
+            <input type="text" name="username">
+
+            <label>Registered Phone Number</label>
+            <input type="text" name="phone">
+
+            <label>Patient ID</label>
+            <input type="text" name="user_id">
+
+            <label>Password</label>
+            <input type="password" name="password">
+        </div>
+
+        <!-- DOCTOR -->
+        <div id="doctorFields" style="display:none;">
+            <label>Username</label>
+            <input type="text" name="username">
+
+            <label>Registered Phone Number</label>
+            <input type="text" name="phone">
+
+            <label>Doctor ID</label>
+            <input type="text" name="user_id">
+
+            <label>Password</label>
+            <input type="password" name="password">
+        </div>
+
+        <!-- ADMIN -->
+        <div id="adminFields" style="display:none;">
+            <label>Username</label>
+            <input type="text" name="username">
+
+            <label>Admin ID</label>
+            <input type="text" name="user_id">
+
+            <label>Registered Phone Number</label>
+            <input type="text" name="phone">
+
+            <label>Password</label>
+            <input type="password" name="password">
+        </div>
+
+        <!-- EXTERNAL -->
+        <div id="externalMsg" style="display:none;">
+            <p style="text-align:center; color: gray;">
+                External users have no access to records.
+            </p>
+        </div>
 
         <button type="submit">Login</button>
 

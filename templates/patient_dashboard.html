@@ -54,6 +54,12 @@
         .empty {
             color: #555;
         }
+
+        .debug {
+            font-size: 12px;
+            color: gray;
+            margin-top: 15px;
+        }
     </style>
 
 </head>
@@ -78,6 +84,13 @@
         {% else %}
             <p class="empty">No records available.</p>
         {% endif %}
+
+        <!-- Debug info (remove later) -->
+        <div class="debug">
+            Patient ID: {{ patient_id }}<br>
+            Files count: {{ files|length }}
+        </div>
+
     </div>
 </div>
 
