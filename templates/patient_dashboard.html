@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patient Dashboard</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            background: linear-gradient(to right, #E8F5E9, #A5D6A7);
+        }
+
+        .container {
+            padding: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #2E7D32;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 420px;
+            margin: auto;
+            box-shadow: 0px 6px 20px rgba(0,0,0,0.15);
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin: 10px 0;
+        }
+
+        a.file-link {
+            text-decoration: none;
+            background: #66BB6A;
+            color: white;
+            padding: 10px;
+            display: block;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        a.file-link:hover {
+            background: #388E3C;
+        }
+
+        .empty {
+            color: #555;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="container">
+    <h1>Patient Dashboard</h1>
+
+    <div class="card">
+        <h3>Your Records</h3>
+
+        {% if files %}
+            <ul>
+                {% for file in files %}
+                    <li>
+                        <a href="/uploads/{{ file }}" class="file-link">
+                            {{ file }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="empty">No records available.</p>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>
