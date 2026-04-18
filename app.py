@@ -8,7 +8,6 @@ app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# create uploads folder if not exists
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
@@ -25,15 +24,12 @@ def handle_login():
 
     print("LOGIN:", role, user_id)
 
-    # external → no credentials needed
     if role == 'external':
         return redirect(url_for('external'))
 
-    # if no ID entered, give default (for testing)
     if not user_id:
         user_id = "guest"
 
-    # redirect based on role
     if role == 'admin':
         return redirect(url_for('admin'))
 
@@ -61,8 +57,6 @@ def doctor(doctor_id):
         if len(parts) >= 2 and parts[1] == doctor_id:
             doctor_files.append(f)
 
-    print("Doctor:", doctor_id, "Files:", doctor_files)
-
     return render_template('doctor_dashboard.html', files=doctor_files, doctor_id=doctor_id)
 
 @app.route('/patient/<patient_id>')
@@ -74,13 +68,18 @@ def patient(patient_id):
         if f.startswith(patient_id + "_"):
             patient_files.append(f)
 
-    print("Patient:", patient_id, "Files:", patient_files)
-
     return render_template('patient_dashboard.html', files=patient_files, patient_id=patient_id)
 
 @app.route('/external')
 def external():
     return render_template('external.html')
+
+# ---------------- VIEW ALL RECORDS (NEW) ----------------
+
+@app.route('/patients')
+def patients():
+    files = os.listdir('uploads')
+    return render_template('all_records.html', files=files)
 
 # ---------------- UPLOAD ----------------
 
