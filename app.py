@@ -19,7 +19,7 @@ def init_db():
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
 
-    # USERS
+    # USERS TABLE
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id TEXT PRIMARY KEY,
@@ -30,7 +30,7 @@ def init_db():
         )
     ''')
 
-    # MAPPING
+    # MAPPING TABLE
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS mapping (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -39,28 +39,28 @@ def init_db():
         )
     ''')
 
-    # PATIENT INFO
+    # PATIENT INFO TABLE
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS patient_info (
             patient_id TEXT PRIMARY KEY,
             name TEXT,
             gender TEXT,
             age INTEGER,
+            blood_group TEXT,
             phone TEXT,
             emergency_contact TEXT,
-            history TEXT
+            relation TEXT
         )
     ''')
 
-    # DOCTOR INFO
+    # DOCTOR INFO TABLE
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS doctor_info (
             doctor_id TEXT PRIMARY KEY,
             name TEXT,
             specialization TEXT,
-            experience INTEGER,
-            phone TEXT,
-            license TEXT
+            experience TEXT,
+            phone TEXT
         )
     ''')
 
@@ -126,18 +126,15 @@ def add_user():
         password = request.form.get('password')
         role = request.form.get('role')
 
-        if not all([user_id, username, phone, password, role]):
-            message = "All fields required"
-        else:
-            try:
-                cursor.execute(
-                    "INSERT INTO users VALUES (?, ?, ?, ?, ?)",
-                    (user_id, username, phone, password, role)
-                )
-                conn.commit()
-                message = "User added successfully"
-            except:
-                message = "User already exists"
+        try:
+            cursor.execute(
+                "INSERT INTO users VALUES (?, ?, ?, ?, ?)",
+                (user_id, username, phone, password, role)
+            )
+            conn.commit()
+            message = "User added successfully"
+        except:
+            message = "User already exists"
 
     conn.close()
     return render_template('add_user.html', message=message)
@@ -149,29 +146,32 @@ def add_patient():
     if session.get('role') != 'admin':
         return redirect(url_for('login'))
 
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
     message = ""
 
     if request.method == 'POST':
+        conn = sqlite3.connect(DB_FILE)
+        cursor = conn.cursor()
+
         try:
             cursor.execute('''
-                INSERT INTO patient_info VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO patient_info VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
-                request.form.get('patient_id'),
-                request.form.get('name'),
-                request.form.get('gender'),
-                request.form.get('age'),
-                request.form.get('phone'),
-                request.form.get('emergency'),
-                request.form.get('history')
+                request.form['patient_id'],
+                request.form['name'],
+                request.form['gender'],
+                request.form['age'],
+                request.form['blood_group'],
+                request.form['phone'],
+                request.form['emergency_contact'],
+                request.form['relation']
             ))
             conn.commit()
             message = "Patient info added"
         except:
             message = "Already exists"
 
-    conn.close()
+        conn.close()
+
     return render_template('add_patient.html', message=message)
 
 # ---------------- ADD DOCTOR INFO ----------------
@@ -181,28 +181,29 @@ def add_doctor():
     if session.get('role') != 'admin':
         return redirect(url_for('login'))
 
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
     message = ""
 
     if request.method == 'POST':
+        conn = sqlite3.connect(DB_FILE)
+        cursor = conn.cursor()
+
         try:
             cursor.execute('''
-                INSERT INTO doctor_info VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO doctor_info VALUES (?, ?, ?, ?, ?)
             ''', (
-                request.form.get('doctor_id'),
-                request.form.get('name'),
-                request.form.get('specialization'),
-                request.form.get('experience'),
-                request.form.get('phone'),
-                request.form.get('license')
+                request.form['doctor_id'],
+                request.form['name'],
+                request.form['specialization'],
+                request.form['experience'],
+                request.form['phone']
             ))
             conn.commit()
             message = "Doctor info added"
         except:
             message = "Already exists"
 
-    conn.close()
+        conn.close()
+
     return render_template('add_doctor.html', message=message)
 
 # ---------------- VIEW PATIENT INFO ----------------
@@ -218,8 +219,8 @@ def patient_info():
         conn = sqlite3.connect(DB_FILE)
         cursor = conn.cursor()
 
-        cursor.execute("SELECT * FROM patient_info WHERE patient_id=?",
-                       (request.form.get('patient_id'),))
+        cursor.execute("SELECT * FROM patient_info WHERE patient_id=?", 
+                       (request.form['patient_id'],))
         data = cursor.fetchone()
 
         conn.close()
@@ -239,8 +240,8 @@ def doctor_info():
         conn = sqlite3.connect(DB_FILE)
         cursor = conn.cursor()
 
-        cursor.execute("SELECT * FROM doctor_info WHERE doctor_id=?",
-                       (request.form.get('doctor_id'),))
+        cursor.execute("SELECT * FROM doctor_info WHERE doctor_id=?", 
+                       (request.form['doctor_id'],))
         data = cursor.fetchone()
 
         conn.close()
@@ -259,21 +260,20 @@ def mapping():
     message = ""
 
     if request.method == 'POST':
-        doctor_id = request.form.get('doctor_id')
-        patient_id = request.form.get('patient_id')
-
-        cursor.execute("INSERT INTO mapping (doctor_id, patient_id) VALUES (?, ?)",
-                       (doctor_id, patient_id))
+        cursor.execute(
+            "INSERT INTO mapping (doctor_id, patient_id) VALUES (?, ?)",
+            (request.form['doctor_id'], request.form['patient_id'])
+        )
         conn.commit()
         message = "Mapping added"
 
-    cursor.execute("SELECT doctor_id, patient_id FROM mapping")
+    cursor.execute("SELECT * FROM mapping")
     mappings = cursor.fetchall()
 
     conn.close()
     return render_template('mapping.html', mappings=mappings, message=message)
 
-# ---------------- VIEW FILES ----------------
+# ---------------- VIEW RECORDS ----------------
 
 @app.route('/patients')
 def patients():
@@ -282,19 +282,6 @@ def patients():
 
     files = os.listdir(UPLOAD_FOLDER)
     return render_template('all_records.html', files=files)
-
-# ---------------- DELETE FILE ----------------
-
-@app.route('/delete_file/<filename>')
-def delete_file(filename):
-    if session.get('role') != 'admin':
-        return redirect(url_for('login'))
-
-    path = os.path.join(UPLOAD_FOLDER, filename)
-    if os.path.exists(path):
-        os.remove(path)
-
-    return redirect(url_for('patients'))
 
 # ---------------- UPLOAD ----------------
 
@@ -308,24 +295,26 @@ def upload():
         patient_id = request.form.get('patient_id')
         doctor_id = request.form.get('doctor_id')
 
-        if file:
+        if file and patient_id and doctor_id:
             filename = f"{patient_id}_{doctor_id}_{file.filename}"
             file.save(os.path.join(UPLOAD_FOLDER, filename))
             return "Uploaded successfully"
 
     return render_template('upload.html')
 
-# ---------------- DASHBOARDS ----------------
+# ---------------- DOCTOR DASHBOARD ----------------
 
-@app.route('/doctor/<doctor_id>')
+@app.route('/doctor/<doctor_id>', methods=['GET', 'POST'])
 def doctor_dashboard(doctor_id):
     if session.get('role') != 'doctor':
         return redirect(url_for('login'))
 
     files = os.listdir(UPLOAD_FOLDER)
-    doctor_files = [f for f in files if len(f.split('_')) > 1 and f.split('_')[1] == doctor_id]
+    doctor_files = [f for f in files if f.split('_')[1] == doctor_id] if files else []
 
-    return render_template('doctor_dashboard.html', files=doctor_files)
+    return render_template('doctor_dashboard.html', files=doctor_files, doctor_id=doctor_id)
+
+# ---------------- PATIENT DASHBOARD ----------------
 
 @app.route('/patient/<patient_id>')
 def patient_dashboard(patient_id):
@@ -335,10 +324,14 @@ def patient_dashboard(patient_id):
     files = os.listdir(UPLOAD_FOLDER)
     patient_files = [f for f in files if f.startswith(patient_id + "_")]
 
-    return render_template('patient_dashboard.html', files=patient_files)
+    return render_template('patient_dashboard.html', files=patient_files, patient_id=patient_id)
+
+# ---------------- EXTERNAL ----------------
 
 @app.route('/external')
 def external_dashboard():
+    if session.get('role') != 'external':
+        return redirect(url_for('login'))
     return render_template('external.html')
 
 # ---------------- RUN ----------------
