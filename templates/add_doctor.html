@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Doctor Info</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #E8F5E9, #C8E6C9, #A5D6A7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 18px;
+            width: 380px;
+            box-shadow: 0px 10px 25px rgba(0,0,0,0.15);
+        }
+
+        h2 {
+            text-align: center;
+            color: #1B5E20;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to right, #66BB6A, #43A047);
+            border: none;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: linear-gradient(to right, #43A047, #2E7D32);
+        }
+
+        .msg {
+            text-align: center;
+            margin-top: 10px;
+            color: #2E7D32;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+    <h2>Add Doctor Info</h2>
+
+    <form method="POST">
+
+        <input type="text" name="doctor_id" placeholder="Doctor ID" required>
+        <input type="text" name="name" placeholder="Full Name" required>
+        <input type="text" name="specialization" placeholder="Specialization" required>
+        <input type="number" name="experience" placeholder="Years of Experience" required>
+        <input type="text" name="phone" placeholder="Phone Number" required>
+        <input type="text" name="license" placeholder="License Number" required>
+
+        <button type="submit">Add Doctor</button>
+    </form>
+
+    <div class="msg">{{ message }}</div>
+
+</div>
+
+</body>
+</html>

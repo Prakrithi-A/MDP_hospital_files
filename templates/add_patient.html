@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Patient Info</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #E8F5E9, #C8E6C9, #A5D6A7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 380px;
+            box-shadow: 0px 10px 25px rgba(0,0,0,0.15);
+        }
+
+        h2 {
+            text-align: center;
+            color: #1B5E20;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #43A047;
+            color: white;
+            border: none;
+            border-radius: 8px;
+        }
+
+        button:hover {
+            background: #2E7D32;
+        }
+
+        .msg {
+            text-align: center;
+            margin-top: 10px;
+            color: #2E7D32;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <h2>Add Patient Info</h2>
+
+    <form method="POST">
+
+        <input type="text" name="patient_id" placeholder="Patient ID" required>
+        <input type="text" name="name" placeholder="Full Name" required>
+        <input type="text" name="gender" placeholder="Gender" required>
+        <input type="number" name="age" placeholder="Age" required>
+        <input type="text" name="phone" placeholder="Phone Number" required>
+        <input type="text" name="emergency" placeholder="Emergency Contact" required>
+        <textarea name="history" placeholder="Medical History"></textarea>
+
+        <button type="submit">Add Info</button>
+
+    </form>
+
+    <div class="msg">
+        {{ message }}
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -6,97 +6,62 @@
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #E8F5E9, #C8E6C9, #A5D6A7);
             margin: 0;
-            background: linear-gradient(to right, #E8F5E9, #A5D6A7);
         }
 
         .container {
-            padding: 40px;
-            text-align: center;
+            width: 500px;
+            margin: 60px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0px 10px 25px rgba(0,0,0,0.15);
         }
 
-        h1 {
-            color: #2E7D32;
+        h2 {
+            text-align: center;
+            color: #1B5E20;
             margin-bottom: 20px;
         }
 
-        .card {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            width: 500px;
-            margin: auto;
-            box-shadow: 0px 6px 20px rgba(0,0,0,0.15);
-        }
-
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        li {
-            margin: 10px 0;
-        }
-
-        a.file-link {
-            text-decoration: none;
-            background: #66BB6A;
-            color: white;
+        .file {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding: 10px;
-            display: block;
-            border-radius: 8px;
-            transition: 0.3s;
+            border-bottom: 1px solid #eee;
         }
 
-        a.file-link:hover {
-            background: #388E3C;
-        }
-
-        .empty {
-            color: #555;
-        }
-
-        .back-btn {
-            margin-top: 20px;
-            display: inline-block;
-            padding: 10px 15px;
-            background: #2E7D32;
+        .delete-btn {
             color: white;
-            border-radius: 8px;
+            background: #E53935;
+            padding: 6px 10px;
+            border-radius: 6px;
             text-decoration: none;
         }
 
-        .back-btn:hover {
-            background: #1B5E20;
+        .delete-btn:hover {
+            background: #B71C1C;
         }
-    </style>
 
+    </style>
 </head>
+
 <body>
 
 <div class="container">
 
-    <h1>All Uploaded Records</h1>
+    <h2>Uploaded Records</h2>
 
-    <div class="card">
-
-        {% if files %}
-            <ul>
-                {% for file in files %}
-                    <li>
-                        <a href="/uploads/{{ file }}" class="file-link">
-                            {{ file }}
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p class="empty">No records available.</p>
-        {% endif %}
-
-        <a href="/admin" class="back-btn">← Back to Dashboard</a>
-
-    </div>
+    {% for file in files %}
+        <div class="file">
+            <span>{{ file }}</span>
+            <a href="{{ url_for('delete_file', filename=file) }}" class="delete-btn">
+                Delete
+            </a>
+        </div>
+    {% endfor %}
 
 </div>
 

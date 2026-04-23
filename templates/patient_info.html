@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patient Info</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #E8F5E9, #C8E6C9, #A5D6A7);
+            margin: 0;
+        }
+
+        .container {
+            width: 420px;
+            margin: 60px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0px 10px 25px rgba(0,0,0,0.15);
+        }
+
+        h2 {
+            text-align: center;
+            color: #1B5E20;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to right, #66BB6A, #43A047);
+            border: none;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: linear-gradient(to right, #43A047, #2E7D32);
+        }
+
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #F1F8E9;
+            border-radius: 10px;
+        }
+
+        .update-btn {
+            display: block;
+            margin-top: 15px;
+            text-align: center;
+            background: #388E3C;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+
+        .update-btn:hover {
+            background: #1B5E20;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Patient Info</h2>
+
+    <form method="POST">
+        <input type="text" name="patient_id" placeholder="Enter Patient ID" required>
+        <button type="submit">Search</button>
+    </form>
+
+    {% if data %}
+    <div class="info">
+        <p><b>Name:</b> {{ data[1] }}</p>
+        <p><b>Gender:</b> {{ data[2] }}</p>
+        <p><b>Age:</b> {{ data[3] }}</p>
+        <p><b>Phone:</b> {{ data[4] }}</p>
+        <p><b>Emergency:</b> {{ data[5] }}</p>
+        <p><b>History:</b> {{ data[6] }}</p>
+
+        <a href="{{ url_for('update_patient', patient_id=data[0]) }}" class="update-btn">
+            Update Info
+        </a>
+    </div>
+    {% endif %}
+
+</div>
+
+</body>
+</html>
