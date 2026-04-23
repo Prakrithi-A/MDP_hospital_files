@@ -23,18 +23,18 @@
         }
 
         .card {
-            background: white;
+            background: #ffffff;
             padding: 30px;
             border-radius: 18px;
-            width: 400px;
+            width: 420px;
             margin: auto;
-            box-shadow: 0px 10px 25px rgba(0,0,0,0.15);
+            box-shadow: 0px 12px 30px rgba(0, 0, 0, 0.15);
         }
 
         .section-title {
-            margin-top: 18px;
+            margin-top: 20px;
             font-size: 13px;
-            color: #4CAF50;
+            color: #2E7D32;
             text-transform: uppercase;
             letter-spacing: 1.2px;
             font-weight: 600;
@@ -42,20 +42,20 @@
 
         .btn {
             display: block;
-            margin: 12px 0;
-            padding: 13px;
-            background: linear-gradient(to right, #66BB6A, #43A047);
+            margin: 10px 0;
+            padding: 14px;
+            background: linear-gradient(90deg, #66BB6A, #43A047);
             color: white;
             text-decoration: none;
-            border-radius: 10px;
+            border-radius: 12px;
             transition: all 0.3s ease;
             font-weight: 500;
         }
 
         .btn:hover {
-            transform: scale(1.03);
-            background: linear-gradient(to right, #43A047, #2E7D32);
-            box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+            transform: translateY(-2px) scale(1.02);
+            background: linear-gradient(90deg, #43A047, #2E7D32);
+            box-shadow: 0px 6px 15px rgba(0,0,0,0.2);
         }
 
         .logout {
@@ -64,7 +64,7 @@
             color: #C62828;
             font-size: 14px;
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .logout:hover {
@@ -83,12 +83,18 @@
 
         <div class="section-title">Records</div>
         <a href="{{ url_for('upload') }}" class="btn">Upload Medical Record</a>
-        <a href="{{ url_for('patients') }}" class="btn">View All Records</a>
+        <a href="{{ url_for('patients') }}" class="btn">View Patient Records</a>
 
-        <div class="section-title">Management</div>
+        <div class="section-title">User Management</div>
         <a href="{{ url_for('add_user') }}" class="btn">Add Users</a>
         <a href="{{ url_for('mapping') }}" class="btn">Doctor–Patient Mapping</a>
         <a href="{{ url_for('doctors') }}" class="btn">Manage Doctors</a>
+
+        <div class="section-title">Information</div>
+        <a href="{{ url_for('add_patient') }}" class="btn">Add Patient Info</a>
+        <a href="{{ url_for('add_doctor') }}" class="btn">Add Doctor Info</a>
+        <a href="{{ url_for('patient_info') }}" class="btn">View Patient Info</a>
+        <a href="{{ url_for('doctor_info') }}" class="btn">View Doctor Info</a>
 
         <a href="{{ url_for('logout') }}" class="logout">Logout</a>
 
