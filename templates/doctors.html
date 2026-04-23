@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Doctors</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI';
+            background: linear-gradient(to right, #E8F5E9, #A5D6A7);
+            text-align: center;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            width: 400px;
+            margin: 40px auto;
+            border-radius: 15px;
+            box-shadow: 0px 5px 15px rgba(0,0,0,0.2);
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background: #81C784;
+            margin: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>Doctors List</h2>
+
+<div class="card">
+    <ul>
+        {% for doc in doctors %}
+            <li>{{ doc[0] }} - {{ doc[1] }}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<a href="/admin">← Back</a>
+
+</body>
+</html>

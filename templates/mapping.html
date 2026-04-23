@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Doctor Dashboard</title>
+    <title>Doctor-Patient Mapping</title>
 
     <style>
         body {
@@ -13,8 +13,8 @@
         .card {
             background: white;
             padding: 25px;
+            width: 420px;
             margin: 30px auto;
-            width: 400px;
             border-radius: 15px;
             box-shadow: 0px 5px 15px rgba(0,0,0,0.2);
         }
@@ -38,60 +38,44 @@
 
         ul {
             list-style: none;
+            padding: 0;
         }
 
-        a.file {
-            text-decoration: none;
-            background: #81C784;
-            display: block;
+        li {
+            background: #C8E6C9;
+            margin: 8px;
             padding: 10px;
-            margin: 5px;
             border-radius: 8px;
-            color: white;
         }
 
-        a.file:hover {
-            background: #2E7D32;
-        }
-
-        .error {
-            color: red;
+        .msg {
+            font-weight: bold;
         }
     </style>
 </head>
 
 <body>
 
-<h2>Doctor Dashboard</h2>
+<h2>Doctor-Patient Mapping</h2>
 
 <div class="card">
-    <h3>Enter Patient ID</h3>
-
     <form method="POST">
-        <input type="text" name="patient_id" placeholder="Enter Patient ID" required>
-        <button type="submit">View Records</button>
+        <input name="doctor_id" placeholder="Doctor ID" required>
+        <input name="patient_id" placeholder="Patient ID" required>
+        <button type="submit">Add Mapping</button>
     </form>
+
+    <p class="msg">{{ message }}</p>
 </div>
 
 <div class="card">
+    <h3>Existing Mappings</h3>
 
-    {% if message %}
-        <p class="error">{{ message }}</p>
-    {% endif %}
-
-    {% if files %}
-        <h3>Patient Records</h3>
-        <ul>
-            {% for file in files %}
-                <li>
-                    <a href="/uploads/{{ file }}" class="file">
-                        {{ file }}
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-
+    <ul>
+        {% for d, p in mappings %}
+            <li>Doctor: {{ d }} → Patient: {{ p }}</li>
+        {% endfor %}
+    </ul>
 </div>
 
 <a href="/admin">← Back</a>

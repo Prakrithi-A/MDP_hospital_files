@@ -59,28 +59,20 @@
         function updateForm() {
             let role = document.getElementById("role").value;
 
-            document.getElementById("patientFields").style.display = "none";
-            document.getElementById("doctorFields").style.display = "none";
-            document.getElementById("adminFields").style.display = "none";
+            document.getElementById("fields").style.display = "none";
             document.getElementById("externalMsg").style.display = "none";
 
-            if (role === "patient") {
-                document.getElementById("patientFields").style.display = "block";
-            }
-            else if (role === "doctor") {
-                document.getElementById("doctorFields").style.display = "block";
-            }
-            else if (role === "admin") {
-                document.getElementById("adminFields").style.display = "block";
-            }
-            else {
+            if (role === "external") {
                 document.getElementById("externalMsg").style.display = "block";
+            } else if (role !== "") {
+                document.getElementById("fields").style.display = "block";
             }
         }
     </script>
 
 </head>
-<body>
+
+<body onload="updateForm()">
 
 <div class="container">
 
@@ -97,55 +89,25 @@
             <option value="external">External</option>
         </select>
 
-        <!-- PATIENT -->
-        <div id="patientFields" style="display:none;">
+        <!-- ALL FIELDS -->
+        <div id="fields" style="display:none;">
             <label>Username</label>
-            <input type="text" name="username">
+            <input type="text" name="username" placeholder="Enter username">
 
-            <label>Registered Phone Number</label>
-            <input type="text" name="phone">
+            <label>Phone</label>
+            <input type="text" name="phone" placeholder="Enter phone number">
 
-            <label>Patient ID</label>
-            <input type="text" name="user_id">
+            <label>User ID</label>
+            <input type="text" name="user_id" placeholder="Enter ID">
 
             <label>Password</label>
-            <input type="password" name="password">
-        </div>
-
-        <!-- DOCTOR -->
-        <div id="doctorFields" style="display:none;">
-            <label>Username</label>
-            <input type="text" name="username">
-
-            <label>Registered Phone Number</label>
-            <input type="text" name="phone">
-
-            <label>Doctor ID</label>
-            <input type="text" name="user_id">
-
-            <label>Password</label>
-            <input type="password" name="password">
-        </div>
-
-        <!-- ADMIN -->
-        <div id="adminFields" style="display:none;">
-            <label>Username</label>
-            <input type="text" name="username">
-
-            <label>Admin ID</label>
-            <input type="text" name="user_id">
-
-            <label>Registered Phone Number</label>
-            <input type="text" name="phone">
-
-            <label>Password</label>
-            <input type="password" name="password">
+            <input type="password" name="password" placeholder="Enter password">
         </div>
 
         <!-- EXTERNAL -->
         <div id="externalMsg" style="display:none;">
             <p style="text-align:center; color: gray;">
-                External users have no access to records.
+                External users have no access.
             </p>
         </div>
 
