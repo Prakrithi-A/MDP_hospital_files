@@ -1,85 +1,124 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Add Patient Info</title>
+    <title>Add / Update Patient Info</title>
 
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
+            margin: 0;
             background: linear-gradient(135deg, #E8F5E9, #C8E6C9, #A5D6A7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
             height: 100vh;
+        }
+
+        .container {
+            padding: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #1B5E20;
+            margin-bottom: 20px;
         }
 
         .card {
             background: white;
             padding: 30px;
-            border-radius: 15px;
-            width: 380px;
+            border-radius: 18px;
+            width: 420px;
+            margin: auto;
             box-shadow: 0px 10px 25px rgba(0,0,0,0.15);
         }
 
-        h2 {
-            text-align: center;
-            color: #1B5E20;
-        }
-
-        input, textarea {
+        select, input {
             width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 10px;
             border: 1px solid #ccc;
         }
 
-        button {
-            width: 100%;
+        .btn {
+            margin-top: 15px;
             padding: 12px;
-            background: #43A047;
-            color: white;
+            width: 100%;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
+            background: linear-gradient(to right, #66BB6A, #43A047);
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
         }
 
-        button:hover {
-            background: #2E7D32;
+        .btn:hover {
+            background: linear-gradient(to right, #43A047, #2E7D32);
         }
 
-        .msg {
-            text-align: center;
-            margin-top: 10px;
+        .message {
+            margin-top: 15px;
+            font-size: 14px;
             color: #2E7D32;
             font-weight: 500;
         }
+
+        .back {
+            display: inline-block;
+            margin-top: 15px;
+            color: #1B5E20;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back:hover {
+            text-decoration: underline;
+        }
+
     </style>
 </head>
 
 <body>
 
-<div class="card">
+<div class="container">
+    <h1>Patient Information</h1>
 
-    <h2>Add Patient Info</h2>
+    <div class="card">
 
-    <form method="POST">
+        <form method="POST">
 
-        <input type="text" name="patient_id" placeholder="Patient ID" required>
-        <input type="text" name="name" placeholder="Full Name" required>
-        <input type="text" name="gender" placeholder="Gender" required>
-        <input type="number" name="age" placeholder="Age" required>
-        <input type="text" name="phone" placeholder="Phone Number" required>
-        <input type="text" name="emergency" placeholder="Emergency Contact" required>
-        <textarea name="history" placeholder="Medical History"></textarea>
+            <!-- Patient ID Dropdown -->
+            <select name="patient_id" required>
+                <option value="">Select Patient ID</option>
+                {% for id in patient_ids %}
+                    <option value="{{ id }}">{{ id }}</option>
+                {% endfor %}
+            </select>
 
-        <button type="submit">Add Info</button>
+            <!-- Action -->
+            <select name="action" required>
+                <option value="add">Add New</option>
+                <option value="update">Update Existing</option>
+            </select>
 
-    </form>
+            <!-- Fields -->
+            <input type="text" name="name" placeholder="Full Name" value="{{ data[1] if data }}">
+            <input type="text" name="gender" placeholder="Gender" value="{{ data[2] if data }}">
+            <input type="date" name="dob" value="{{ data[3] if data }}">
+            <input type="text" name="blood_group" placeholder="Blood Group" value="{{ data[4] if data }}">
+            <input type="text" name="phone" placeholder="Phone Number" value="{{ data[5] if data }}">
+            <input type="text" name="emergency_contact" placeholder="Emergency Contact" value="{{ data[6] if data }}">
+            <input type="text" name="relation" placeholder="Relation (Parent/Spouse/etc.)" value="{{ data[7] if data }}">
 
-    <div class="msg">
-        {{ message }}
+            <button type="submit" class="btn">Submit</button>
+
+        </form>
+
+        {% if message %}
+            <div class="message">{{ message }}</div>
+        {% endif %}
+
+        <a href="{{ url_for('admin_dashboard') }}" class="back">← Back to Dashboard</a>
+
     </div>
-
 </div>
 
 </body>

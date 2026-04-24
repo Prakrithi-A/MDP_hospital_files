@@ -2,35 +2,56 @@
 <html>
 <head>
     <title>Patient Info</title>
+
     <style>
         body {
-            font-family: 'Segoe UI';
+            font-family: 'Segoe UI', sans-serif;
             background: linear-gradient(to right, #E8F5E9, #A5D6A7);
             text-align: center;
+            padding: 40px;
         }
+
         .card {
             background: white;
             padding: 25px;
+            border-radius: 15px;
             width: 400px;
             margin: auto;
-            border-radius: 12px;
+            box-shadow: 0px 6px 20px rgba(0,0,0,0.15);
         }
-        input, button {
-            margin: 8px;
-            padding: 10px;
+
+        input, select {
             width: 90%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
         }
+
         button {
-            background: #43A047;
+            padding: 10px 20px;
+            background: #66BB6A;
             color: white;
             border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #388E3C;
+        }
+
+        h2 {
+            color: #2E7D32;
         }
     </style>
 </head>
+
 <body>
 
 <div class="card">
-    <h2>View Patient Info</h2>
+
+    <h2>Search Patient</h2>
 
     <form method="POST">
         <input type="text" name="patient_id" placeholder="Enter Patient ID" required>
@@ -38,19 +59,45 @@
     </form>
 
     {% if data %}
-        <hr>
-        <p><b>Name:</b> {{ data[1] }}</p>
-        <p><b>Gender:</b> {{ data[2] }}</p>
-        <p><b>Age:</b> {{ data[3] }}</p>
-        <p><b>Phone:</b> {{ data[4] }}</p>
-        <p><b>Blood Group:</b> {{ data[5] }}</p>
-        <p><b>Emergency Contact:</b> {{ data[6] }}</p>
-        <p><b>Relation:</b> {{ data[7] }}</p>
 
-        <a href="{{ url_for('update_patient', patient_id=data[0]) }}">
-            <button>Update Info</button>
-        </a>
+    <h2>Edit Patient Info</h2>
+
+    <form method="POST" action="/update_patient/{{ data[0] }}">
+
+        <input type="text" name="name" value="{{ data[1] }}" required>
+
+        <select name="gender">
+            <option {{ 'selected' if data[2]=='Male' else '' }}>Male</option>
+            <option {{ 'selected' if data[2]=='Female' else '' }}>Female</option>
+            <option {{ 'selected' if data[2]=='Other' else '' }}>Other</option>
+        </select>
+
+        <input type="date" name="dob" value="{{ data[3] }}" required>
+
+        <select name="blood_group">
+            <option {{ 'selected' if data[4]=='A+' else '' }}>A+</option>
+            <option {{ 'selected' if data[4]=='B+' else '' }}>B+</option>
+            <option {{ 'selected' if data[4]=='O+' else '' }}>O+</option>
+            <option {{ 'selected' if data[4]=='AB+' else '' }}>AB+</option>
+        </select>
+
+        <input type="text" name="phone" value="{{ data[5] }}">
+        <input type="text" name="emergency_contact" value="{{ data[6] }}">
+
+        <select name="relation">
+            <option {{ 'selected' if data[7]=='Spouse' else '' }}>Spouse</option>
+            <option {{ 'selected' if data[7]=='Parent' else '' }}>Parent</option>
+            <option {{ 'selected' if data[7]=='Family' else '' }}>Family</option>
+            <option {{ 'selected' if data[7]=='Friend' else '' }}>Friend</option>
+            <option {{ 'selected' if data[7]=='Other' else '' }}>Other</option>
+        </select>
+
+        <button type="submit">Update</button>
+
+    </form>
+
     {% endif %}
+
 </div>
 
 </body>

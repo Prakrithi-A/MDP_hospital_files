@@ -1,35 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Manage Doctors</title>
-
+    <title>Doctors List</title>
     <style>
         body {
-            font-family: 'Segoe UI';
+            font-family: 'Segoe UI', sans-serif;
             background: linear-gradient(to right, #E8F5E9, #A5D6A7);
+            padding: 40px;
             text-align: center;
         }
 
-        .card {
+        h2 {
+            color: #2E7D32;
+        }
+
+        table {
+            margin: auto;
+            border-collapse: collapse;
+            width: 80%;
             background: white;
-            padding: 25px;
-            width: 400px;
-            margin: 40px auto;
-            border-radius: 15px;
-            box-shadow: 0px 5px 15px rgba(0,0,0,0.2);
+            border-radius: 10px;
+            overflow: hidden;
         }
 
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        li {
-            background: #81C784;
-            margin: 10px;
+        th, td {
             padding: 12px;
-            border-radius: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #66BB6A;
             color: white;
+        }
+
+        tr:hover {
+            background: #f1f1f1;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #2E7D32;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -38,15 +51,27 @@
 
 <h2>Doctors List</h2>
 
-<div class="card">
-    <ul>
-        {% for doc in doctors %}
-            <li>{{ doc[0] }} - {{ doc[1] }}</li>
-        {% endfor %}
-    </ul>
-</div>
+<table>
+    <tr>
+        <th>Doctor ID</th>
+        <th>Name</th>
+        <th>Specialization</th>
+        <th>Experience</th>
+        <th>Phone</th>
+    </tr>
 
-<a href="/admin">← Back</a>
+    {% for d in doctors %}
+    <tr>
+        <td>{{ d[0] }}</td>
+        <td>{{ d[1] }}</td>
+        <td>{{ d[2] }}</td>
+        <td>{{ d[3] }}</td>
+        <td>{{ d[4] }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="{{ url_for('admin_dashboard') }}">← Back to Dashboard</a>
 
 </body>
 </html>

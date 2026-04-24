@@ -13,13 +13,12 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
-# ---------------- DATABASE INIT ----------------
+# ---------------- DATABASE ----------------
 
 def init_db():
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
 
-    # USERS TABLE
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id TEXT PRIMARY KEY,
@@ -30,22 +29,12 @@ def init_db():
         )
     ''')
 
-    # MAPPING TABLE
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS mapping (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            doctor_id TEXT,
-            patient_id TEXT
-        )
-    ''')
-
-    # PATIENT INFO TABLE
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS patient_info (
             patient_id TEXT PRIMARY KEY,
             name TEXT,
             gender TEXT,
-            age INTEGER,
+            dob TEXT,
             blood_group TEXT,
             phone TEXT,
             emergency_contact TEXT,
@@ -53,7 +42,6 @@ def init_db():
         )
     ''')
 
-    # DOCTOR INFO TABLE
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS doctor_info (
             doctor_id TEXT PRIMARY KEY,
@@ -79,7 +67,7 @@ def handle_login():
     role = request.form.get('role')
     user_id = request.form.get('user_id')
 
-    session['role'] = role
+    session['role'] = role.lower() if role else ""
     session['user_id'] = user_id
 
     if role == 'admin':
@@ -100,242 +88,237 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
-# ---------------- ADMIN DASHBOARD ----------------
+# ---------------- ADMIN ----------------
 
 @app.route('/admin')
 def admin_dashboard():
-    if session.get('role') != 'admin':
-        return redirect(url_for('login'))
     return render_template('admin_dashboard.html')
 
 # ---------------- ADD USER ----------------
 
 @app.route('/add_user', methods=['GET', 'POST'])
 def add_user():
-    if session.get('role') != 'admin':
-        return redirect(url_for('login'))
-
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
     message = ""
 
     if request.method == 'POST':
-        user_id = request.form.get('user_id')
-        username = request.form.get('username')
-        phone = request.form.get('phone')
-        password = request.form.get('password')
-        role = request.form.get('role')
-
         try:
+            conn = sqlite3.connect(DB_FILE)
+            cursor = conn.cursor()
+
+            role = request.form['role'].lower()   # normalize role
+
             cursor.execute(
                 "INSERT INTO users VALUES (?, ?, ?, ?, ?)",
-                (user_id, username, phone, password, role)
+                (
+                    request.form['user_id'],
+                    request.form['username'],
+                    request.form['phone'],
+                    request.form['password'],
+                    role
+                )
             )
+
             conn.commit()
             message = "User added successfully"
-        except:
-            message = "User already exists"
+        except Exception as e:
+            message = f"Error: {e}"
+        finally:
+            conn.close()
 
-    conn.close()
     return render_template('add_user.html', message=message)
 
-# ---------------- ADD PATIENT INFO ----------------
+# ---------------- ADD / UPDATE PATIENT ----------------
 
 @app.route('/add_patient', methods=['GET', 'POST'])
 def add_patient():
-    if session.get('role') != 'admin':
-        return redirect(url_for('login'))
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+
+    # DEBUG PRINT
+    cursor.execute("SELECT * FROM users")
+    print("USERS TABLE:", cursor.fetchall())
+
+    # case-insensitive fetch
+    cursor.execute("SELECT id FROM users WHERE LOWER(role)='patient'")
+    patient_ids = [row[0] for row in cursor.fetchall()]
 
     message = ""
+    data = None
 
     if request.method == 'POST':
-        conn = sqlite3.connect(DB_FILE)
-        cursor = conn.cursor()
+        patient_id = request.form['patient_id']
+        action = request.form['action']
 
-        try:
-            cursor.execute('''
-                INSERT INTO patient_info VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
-                request.form['patient_id'],
-                request.form['name'],
-                request.form['gender'],
-                request.form['age'],
-                request.form['blood_group'],
-                request.form['phone'],
-                request.form['emergency_contact'],
-                request.form['relation']
-            ))
-            conn.commit()
-            message = "Patient info added"
-        except:
-            message = "Already exists"
+        cursor.execute(
+            "SELECT * FROM users WHERE LOWER(id)=LOWER(?) AND LOWER(role)='patient'",
+            (patient_id,)
+        )
+        user = cursor.fetchone()
 
-        conn.close()
+        print("USER CHECK:", user)
 
-    return render_template('add_patient.html', message=message)
+        if not user:
+            message = "Patient login not found"
+        else:
+            cursor.execute("SELECT * FROM patient_info WHERE patient_id=?", (patient_id,))
+            existing = cursor.fetchone()
 
-# ---------------- ADD DOCTOR INFO ----------------
+            if action == "add":
+                if existing:
+                    message = "Already exists, use update"
+                else:
+                    cursor.execute('''
+                        INSERT INTO patient_info VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    ''', (
+                        patient_id,
+                        request.form['name'],
+                        request.form['gender'],
+                        request.form['dob'],
+                        request.form['blood_group'],
+                        request.form['phone'],
+                        request.form['emergency_contact'],
+                        request.form['relation']
+                    ))
+                    conn.commit()
+                    message = "Patient info added"
+
+            elif action == "update":
+                if not existing:
+                    message = "No data to update"
+                else:
+                    cursor.execute('''
+                        UPDATE patient_info SET
+                        name=?, gender=?, dob=?, blood_group=?, phone=?, emergency_contact=?, relation=?
+                        WHERE patient_id=?
+                    ''', (
+                        request.form['name'],
+                        request.form['gender'],
+                        request.form['dob'],
+                        request.form['blood_group'],
+                        request.form['phone'],
+                        request.form['emergency_contact'],
+                        request.form['relation'],
+                        patient_id
+                    ))
+                    conn.commit()
+                    message = "Patient info updated"
+
+            data = existing
+
+    conn.close()
+    return render_template('add_patient.html', patient_ids=patient_ids, message=message, data=data)
+
+# ---------------- ADD / UPDATE DOCTOR ----------------
 
 @app.route('/add_doctor', methods=['GET', 'POST'])
 def add_doctor():
-    if session.get('role') != 'admin':
-        return redirect(url_for('login'))
-
-    message = ""
-
-    if request.method == 'POST':
-        conn = sqlite3.connect(DB_FILE)
-        cursor = conn.cursor()
-
-        try:
-            cursor.execute('''
-                INSERT INTO doctor_info VALUES (?, ?, ?, ?, ?)
-            ''', (
-                request.form['doctor_id'],
-                request.form['name'],
-                request.form['specialization'],
-                request.form['experience'],
-                request.form['phone']
-            ))
-            conn.commit()
-            message = "Doctor info added"
-        except:
-            message = "Already exists"
-
-        conn.close()
-
-    return render_template('add_doctor.html', message=message)
-
-# ---------------- VIEW PATIENT INFO ----------------
-
-@app.route('/patient_info', methods=['GET', 'POST'])
-def patient_info():
-    if session.get('role') != 'admin':
-        return redirect(url_for('login'))
-
-    data = None
-
-    if request.method == 'POST':
-        conn = sqlite3.connect(DB_FILE)
-        cursor = conn.cursor()
-
-        cursor.execute("SELECT * FROM patient_info WHERE patient_id=?", 
-                       (request.form['patient_id'],))
-        data = cursor.fetchone()
-
-        conn.close()
-
-    return render_template('patient_info.html', data=data)
-
-# ---------------- VIEW DOCTOR INFO ----------------
-
-@app.route('/doctor_info', methods=['GET', 'POST'])
-def doctor_info():
-    if session.get('role') != 'admin':
-        return redirect(url_for('login'))
-
-    data = None
-
-    if request.method == 'POST':
-        conn = sqlite3.connect(DB_FILE)
-        cursor = conn.cursor()
-
-        cursor.execute("SELECT * FROM doctor_info WHERE doctor_id=?", 
-                       (request.form['doctor_id'],))
-        data = cursor.fetchone()
-
-        conn.close()
-
-    return render_template('doctor_info.html', data=data)
-
-# ---------------- MAPPING ----------------
-
-@app.route('/mapping', methods=['GET', 'POST'])
-def mapping():
-    if session.get('role') != 'admin':
-        return redirect(url_for('login'))
-
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
+
+    cursor.execute("SELECT id FROM users WHERE LOWER(role)='doctor'")
+    doctor_ids = [row[0] for row in cursor.fetchall()]
+
     message = ""
+    data = None
 
     if request.method == 'POST':
-        cursor.execute(
-            "INSERT INTO mapping (doctor_id, patient_id) VALUES (?, ?)",
-            (request.form['doctor_id'], request.form['patient_id'])
-        )
-        conn.commit()
-        message = "Mapping added"
+        doctor_id = request.form['doctor_id']
+        action = request.form['action']
 
-    cursor.execute("SELECT * FROM mapping")
-    mappings = cursor.fetchall()
+        cursor.execute(
+            "SELECT * FROM users WHERE LOWER(id)=LOWER(?) AND LOWER(role)='doctor'",
+            (doctor_id,)
+        )
+        user = cursor.fetchone()
+
+        if not user:
+            message = "Doctor login not found"
+        else:
+            cursor.execute("SELECT * FROM doctor_info WHERE doctor_id=?", (doctor_id,))
+            existing = cursor.fetchone()
+
+            if action == "add":
+                if existing:
+                    message = "Already exists, use update"
+                else:
+                    cursor.execute('''
+                        INSERT INTO doctor_info VALUES (?, ?, ?, ?, ?)
+                    ''', (
+                        doctor_id,
+                        request.form['name'],
+                        request.form['specialization'],
+                        request.form['experience'],
+                        request.form['phone']
+                    ))
+                    conn.commit()
+                    message = "Doctor info added"
+
+            elif action == "update":
+                if not existing:
+                    message = "No data to update"
+                else:
+                    cursor.execute('''
+                        UPDATE doctor_info SET
+                        name=?, specialization=?, experience=?, phone=?
+                        WHERE doctor_id=?
+                    ''', (
+                        request.form['name'],
+                        request.form['specialization'],
+                        request.form['experience'],
+                        request.form['phone'],
+                        doctor_id
+                    ))
+                    conn.commit()
+                    message = "Doctor info updated"
+
+            data = existing
 
     conn.close()
-    return render_template('mapping.html', mappings=mappings, message=message)
+    return render_template('add_doctor.html', doctor_ids=doctor_ids, message=message, data=data)
 
-# ---------------- VIEW RECORDS ----------------
+# ---------------- DASHBOARDS ----------------
 
-@app.route('/patients')
-def patients():
-    if session.get('role') != 'admin':
-        return redirect(url_for('login'))
-
-    files = os.listdir(UPLOAD_FOLDER)
-    return render_template('all_records.html', files=files)
-
-# ---------------- UPLOAD ----------------
-
-@app.route('/upload', methods=['GET', 'POST'])
-def upload():
-    if session.get('role') != 'admin':
-        return redirect(url_for('login'))
-
-    if request.method == 'POST':
-        file = request.files.get('file')
-        patient_id = request.form.get('patient_id')
-        doctor_id = request.form.get('doctor_id')
-
-        if file and patient_id and doctor_id:
-            filename = f"{patient_id}_{doctor_id}_{file.filename}"
-            file.save(os.path.join(UPLOAD_FOLDER, filename))
-            return "Uploaded successfully"
-
-    return render_template('upload.html')
-
-# ---------------- DOCTOR DASHBOARD ----------------
-
-@app.route('/doctor/<doctor_id>', methods=['GET', 'POST'])
+@app.route('/doctor/<doctor_id>')
 def doctor_dashboard(doctor_id):
-    if session.get('role') != 'doctor':
-        return redirect(url_for('login'))
-
-    files = os.listdir(UPLOAD_FOLDER)
-    doctor_files = [f for f in files if f.split('_')[1] == doctor_id] if files else []
-
-    return render_template('doctor_dashboard.html', files=doctor_files, doctor_id=doctor_id)
-
-# ---------------- PATIENT DASHBOARD ----------------
+    return render_template('doctor_dashboard.html', doctor_id=doctor_id)
 
 @app.route('/patient/<patient_id>')
 def patient_dashboard(patient_id):
-    if session.get('role') != 'patient':
-        return redirect(url_for('login'))
-
-    files = os.listdir(UPLOAD_FOLDER)
-    patient_files = [f for f in files if f.startswith(patient_id + "_")]
-
-    return render_template('patient_dashboard.html', files=patient_files, patient_id=patient_id)
-
-# ---------------- EXTERNAL ----------------
+    return render_template('patient_dashboard.html', patient_id=patient_id)
 
 @app.route('/external')
 def external_dashboard():
-    if session.get('role') != 'external':
-        return redirect(url_for('login'))
     return render_template('external.html')
+
+# ---------------- OTHER ROUTES ----------------
+
+@app.route('/upload')
+def upload():
+    return render_template('upload.html')
+
+@app.route('/patients')
+def patients():
+    return render_template('all_records.html')
+
+@app.route('/mapping')
+def mapping():
+    return render_template('mapping.html')
+
+@app.route('/doctors')
+def doctors():
+    return render_template('doctors.html')
+
+@app.route('/patient_info')
+def patient_info():
+    return render_template('patient_info.html')
+
+@app.route('/doctor_info')
+def doctor_info():
+    return render_template('doctor_info.html')
 
 # ---------------- RUN ----------------
 
 if __name__ == '__main__':
+    print("Using DB:", DB_FILE)
     init_db()
     app.run(debug=True)
