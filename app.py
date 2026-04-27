@@ -249,7 +249,7 @@ def add_doctor():
         msg = "Doctor added"
     return render_template("add_doctor.html", message=msg)
 
-# ---------------- UPLOAD RECORD (FIXED ORDER) ----------------
+# ---------------- UPLOAD RECORD ----------------
 
 @app.route("/doctor/upload_record", methods=["GET", "POST"])
 @login_required("doctor")
@@ -261,7 +261,6 @@ def upload_record():
         conn = get_db()
         cur = conn.cursor()
 
-        # 🔐 CHECK mapping FIRST (important fix)
         cur.execute("""
             SELECT * FROM doctor_patient_map
             WHERE doctor_id=? AND patient_id=?
@@ -271,7 +270,6 @@ def upload_record():
             conn.close()
             return "Not your patient ❌"
 
-        # 📁 NOW save file safely
         file = request.files["file"]
         filename = file.filename
         path = os.path.join(UPLOAD_FOLDER, filename)
@@ -454,6 +452,85 @@ def add_health():
 
     conn.close()
     return render_template("add_health.html", patient=None, history=[], message="")
+
+# ---------------- NEW FIX: PATIENT INFO (ADMIN) ----------------
+
+@app.route("/patient_info", methods=["GET", "POST"])
+@login_required("admin")
+def patient_info():
+    data = None
+    msg = ""
+
+    if request.method == "POST":
+        pid = request.form["patient_id"]
+
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM patient_info WHERE patient_id=?", (pid,))
+        data = cur.fetchone()
+        conn.close()
+
+        if not data:
+            msg = "Patient not found ❌"
+
+    return render_template("patient_info.html", data=data, message=msg)
+
+# ---------------- MAPPING ----------------
+
+@app.route("/mapping", methods=["GET", "POST"])
+@login_required("admin")
+def mapping():
+    msg = ""
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("SELECT * FROM doctor_info")
+    doctors = cur.fetchall()
+
+    cur.execute("SELECT * FROM patient_info")
+    patients = cur.fetchall()
+
+    if request.method == "POST":
+        cur.execute(
+            "INSERT INTO doctor_patient_map VALUES (?, ?)",
+            (request.form["doctor_id"], request.form["patient_id"])
+        )
+        conn.commit()
+        msg = "Mapped successfully"
+
+    cur.execute("SELECT * FROM doctor_patient_map")
+    mappings = cur.fetchall()
+
+    conn.close()
+
+    return render_template("mapping.html",
+                           doctors=doctors,
+                           patients=patients,
+                           mappings=mappings,
+                           message=msg)
+
+# ---------------- DOCTOR INFO ----------------
+
+@app.route("/doctor_info", methods=["GET", "POST"])
+@login_required("admin")
+def doctor_info():
+    data = None
+    msg = ""
+
+    if request.method == "POST":
+        did = request.form["doctor_id"]
+
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM doctor_info WHERE doctor_id=?", (did,))
+        data = cur.fetchone()
+        conn.close()
+
+        if not data:
+            msg = "Doctor not found ❌"
+
+    return render_template("doctor_info.html", data=data, message=msg)
 
 # ---------------- INIT ----------------
 
