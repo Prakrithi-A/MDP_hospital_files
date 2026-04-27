@@ -1,20 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Doctors List</title>
+    <title>Manage Doctors</title>
 
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            background: linear-gradient(135deg, #E8F5E9, #C8E6C9, #A5D6A7);
-            padding: 20px;
+            background: linear-gradient(to right, #E8F5E9, #A5D6A7);
             text-align: center;
+            padding: 30px;
         }
 
         h2 {
             color: #1B5E20;
-            margin-bottom: 20px;
         }
 
         .card {
@@ -29,11 +27,10 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
         }
 
         th {
-            background: #66BB6A;
+            background: #43A047;
             color: white;
             padding: 12px;
         }
@@ -44,26 +41,14 @@
         }
 
         tr:hover {
-            background-color: #E8F5E9;
-        }
-
-        .back {
-            display: inline-block;
-            margin-top: 15px;
-            text-decoration: none;
-            color: #1B5E20;
-            font-weight: bold;
-        }
-
-        .back:hover {
-            text-decoration: underline;
+            background: #E8F5E9;
         }
     </style>
 </head>
 
 <body>
 
-<h2>All Doctors</h2>
+<h2>Doctors Management</h2>
 
 <div class="card">
 
@@ -89,8 +74,6 @@
     </table>
 
 </div>
-
-<a class="back" href="{{ url_for('admin_dashboard') }}">← Back to Dashboard</a>
 
 </body>
 </html>
