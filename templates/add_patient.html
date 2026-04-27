@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Add / Update Patient Info</title>
+    <title>Add Patient</title>
 
     <style>
         body {
@@ -57,8 +57,12 @@
         .message {
             margin-top: 15px;
             font-size: 14px;
-            color: #2E7D32;
             font-weight: 500;
+            color: #2E7D32;
+        }
+
+        .error {
+            color: red;
         }
 
         .back {
@@ -72,20 +76,18 @@
         .back:hover {
             text-decoration: underline;
         }
-
     </style>
 </head>
 
 <body>
 
 <div class="container">
-    <h1>Patient Information</h1>
+    <h1>Add Patient Info</h1>
 
     <div class="card">
 
         <form method="POST">
 
-            <!-- Patient ID Dropdown -->
             <select name="patient_id" required>
                 <option value="">Select Patient ID</option>
                 {% for id in patient_ids %}
@@ -93,27 +95,22 @@
                 {% endfor %}
             </select>
 
-            <!-- Action -->
-            <select name="action" required>
-                <option value="add">Add New</option>
-                <option value="update">Update Existing</option>
-            </select>
+            <input type="text" name="name" placeholder="Full Name" required>
+            <input type="text" name="gender" placeholder="Gender" required>
+            <input type="date" name="dob" required>
+            <input type="text" name="blood_group" placeholder="Blood Group">
+            <input type="text" name="phone" placeholder="Phone Number">
+            <input type="text" name="emergency_contact" placeholder="Emergency Contact">
+            <input type="text" name="relation" placeholder="Relation">
 
-            <!-- Fields -->
-            <input type="text" name="name" placeholder="Full Name" value="{{ data[1] if data }}">
-            <input type="text" name="gender" placeholder="Gender" value="{{ data[2] if data }}">
-            <input type="date" name="dob" value="{{ data[3] if data }}">
-            <input type="text" name="blood_group" placeholder="Blood Group" value="{{ data[4] if data }}">
-            <input type="text" name="phone" placeholder="Phone Number" value="{{ data[5] if data }}">
-            <input type="text" name="emergency_contact" placeholder="Emergency Contact" value="{{ data[6] if data }}">
-            <input type="text" name="relation" placeholder="Relation (Parent/Spouse/etc.)" value="{{ data[7] if data }}">
-
-            <button type="submit" class="btn">Submit</button>
+            <button type="submit" class="btn">Add Patient</button>
 
         </form>
 
         {% if message %}
-            <div class="message">{{ message }}</div>
+            <div class="message {{ 'error' if '❌' in message else '' }}">
+                {{ message }}
+            </div>
         {% endif %}
 
         <a href="{{ url_for('admin_dashboard') }}" class="back">← Back to Dashboard</a>

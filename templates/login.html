@@ -27,11 +27,6 @@
             color: #2E7D32;
         }
 
-        label {
-            font-weight: 600;
-            color: #2E7D32;
-        }
-
         input, select {
             width: 100%;
             padding: 10px;
@@ -54,25 +49,9 @@
             background: #388E3C;
         }
     </style>
-
-    <script>
-        function updateForm() {
-            let role = document.getElementById("role").value;
-
-            document.getElementById("fields").style.display = "none";
-            document.getElementById("externalMsg").style.display = "none";
-
-            if (role === "external") {
-                document.getElementById("externalMsg").style.display = "block";
-            } else if (role !== "") {
-                document.getElementById("fields").style.display = "block";
-            }
-        }
-    </script>
-
 </head>
 
-<body onload="updateForm()">
+<body>
 
 <div class="container">
 
@@ -80,36 +59,18 @@
 
     <form method="POST" action="/login">
 
-        <label>Select Role</label>
-        <select name="role" id="role" onchange="updateForm()" required>
-            <option value="">-- Select --</option>
+        <select name="role" required>
+            <option value="">Select Role</option>
             <option value="admin">Admin</option>
             <option value="doctor">Doctor</option>
             <option value="patient">Patient</option>
             <option value="external">External</option>
         </select>
 
-        <!-- ALL FIELDS -->
-        <div id="fields" style="display:none;">
-            <label>Username</label>
-            <input type="text" name="username" placeholder="Enter username">
-
-            <label>Phone</label>
-            <input type="text" name="phone" placeholder="Enter phone number">
-
-            <label>User ID</label>
-            <input type="text" name="user_id" placeholder="Enter ID">
-
-            <label>Password</label>
-            <input type="password" name="password" placeholder="Enter password">
-        </div>
-
-        <!-- EXTERNAL -->
-        <div id="externalMsg" style="display:none;">
-            <p style="text-align:center; color: gray;">
-                External users have no access.
-            </p>
-        </div>
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="text" name="user_id" placeholder="User ID" required>
+        <input type="text" name="phone" placeholder="Phone Number" required>
+        <input type="password" name="password" placeholder="Password" required>
 
         <button type="submit">Login</button>
 

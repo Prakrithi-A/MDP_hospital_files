@@ -37,6 +37,11 @@
             background: #f1f1f1;
         }
 
+        .empty {
+            margin-top: 20px;
+            color: #555;
+        }
+
         a {
             display: inline-block;
             margin-top: 20px;
@@ -51,6 +56,7 @@
 
 <h2>Doctors List</h2>
 
+{% if doctors %}
 <table>
     <tr>
         <th>Doctor ID</th>
@@ -62,14 +68,17 @@
 
     {% for d in doctors %}
     <tr>
-        <td>{{ d[0] }}</td>
-        <td>{{ d[1] }}</td>
-        <td>{{ d[2] }}</td>
-        <td>{{ d[3] }}</td>
-        <td>{{ d[4] }}</td>
+        <td>{{ d['doctor_id'] }}</td>
+        <td>{{ d['name'] }}</td>
+        <td>{{ d['specialization'] }}</td>
+        <td>{{ d['experience'] }}</td>
+        <td>{{ d['phone'] }}</td>
     </tr>
     {% endfor %}
 </table>
+{% else %}
+    <p class="empty">No doctors found.</p>
+{% endif %}
 
 <a href="{{ url_for('admin_dashboard') }}">← Back to Dashboard</a>
 
