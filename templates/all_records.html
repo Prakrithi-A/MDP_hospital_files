@@ -15,7 +15,7 @@
             background: white;
             padding: 30px;
             border-radius: 18px;
-            width: 550px;
+            width: 600px;
             margin: auto;
             box-shadow: 0px 8px 25px rgba(0,0,0,0.15);
         }
@@ -34,26 +34,27 @@
 
         button {
             padding: 10px 20px;
-            background: #43A047;
+            background: #2E7D32;
             color: white;
             border: none;
             border-radius: 8px;
         }
 
         button:hover {
-            background: #2E7D32;
+            background: #1B5E20;
         }
 
         .record {
-            text-align: left;
             background: #E8F5E9;
             padding: 12px;
             margin-top: 10px;
             border-radius: 10px;
+            text-align: left;
         }
 
         .msg {
             color: red;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -62,7 +63,7 @@
 
 <div class="card">
 
-    <h2>View Patient Records</h2>
+    <h2>View Patient Medical Records</h2>
 
     <form method="POST">
         <input type="text" name="patient_id" placeholder="Enter Patient ID" required>
@@ -76,10 +77,10 @@
     {% if records %}
         {% for r in records %}
             <div class="record">
-                <b>Doctor:</b> {{ r['doctor_id'] }} <br>
-                <b>File:</b> {{ r['file_name'] }} <br>
+                <b>Doctor ID:</b> {{ r['doctor_id'] }} <br>
+                <b>File Name:</b> {{ r['file_name'] }} <br>
                 <b>Notes:</b> {{ r['notes'] }} <br>
-                <b>Date:</b> {{ r['review_date'] }}
+                <b>Review Date:</b> {{ r['review_date'] }}
             </div>
         {% endfor %}
     {% endif %}

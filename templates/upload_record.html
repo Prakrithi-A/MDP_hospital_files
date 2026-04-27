@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Upload Patient Record</title>
+
+<style>
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(to right, #E8F5E9, #A5D6A7);
+    padding: 40px;
+    text-align: center;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    margin: auto;
+    width: 450px;
+    border-radius: 15px;
+    box-shadow: 0px 6px 18px rgba(0,0,0,0.2);
+}
+
+h2 {
+    color: #2E7D32;
+}
+
+input, textarea {
+    width: 85%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+button {
+    width: 90%;
+    padding: 12px;
+    margin-top: 10px;
+    background: linear-gradient(to right, #66BB6A, #43A047);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: linear-gradient(to right, #43A047, #2E7D32);
+}
+
+.msg {
+    margin-top: 10px;
+    color: #1B5E20;
+    font-weight: bold;
+}
+
+.back {
+    display: block;
+    margin-top: 15px;
+    text-decoration: none;
+    color: #2E7D32;
+    font-weight: bold;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+    <h2>Upload Patient Record</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+
+        <input type="text" name="patient_id" placeholder="Enter Patient ID" required>
+
+        <input type="file" name="file" required>
+
+        <textarea name="notes" placeholder="Optional Notes"></textarea>
+
+        <input type="date" name="review_date">
+
+        <button type="submit">Upload Record</button>
+
+    </form>
+
+    {% if message %}
+        <div class="msg">{{ message }}</div>
+    {% endif %}
+
+    <a class="back" href="/doctor">← Back to Dashboard</a>
+
+</div>
+
+</body>
+</html>

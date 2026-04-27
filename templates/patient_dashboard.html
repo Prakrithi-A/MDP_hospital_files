@@ -6,12 +6,12 @@
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
-            margin: 0;
             background: linear-gradient(to right, #E8F5E9, #A5D6A7);
+            margin: 0;
         }
 
         .container {
-            padding: 40px;
+            padding: 30px;
             text-align: center;
         }
 
@@ -21,77 +21,88 @@
 
         .card {
             background: white;
-            padding: 30px;
+            padding: 25px;
+            margin: 20px auto;
+            width: 500px;
             border-radius: 15px;
-            width: 420px;
-            margin: auto;
             box-shadow: 0px 6px 20px rgba(0,0,0,0.15);
         }
 
-        ul {
-            list-style: none;
-            padding: 0;
+        table {
+            width: 100%;
+            border-collapse: collapse;
         }
 
-        li {
-            margin: 10px 0;
-        }
-
-        a.file-link {
-            text-decoration: none;
-            background: #66BB6A;
-            color: white;
+        th, td {
             padding: 10px;
-            display: block;
-            border-radius: 8px;
-            transition: 0.3s;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
         }
 
-        a.file-link:hover {
-            background: #388E3C;
+        th {
+            background: #C8E6C9;
         }
 
         .empty {
-            color: #555;
+            color: #666;
         }
 
-        .debug {
-            font-size: 12px;
-            color: gray;
-            margin-top: 15px;
+        .section-title {
+            color: #2E7D32;
+            margin-bottom: 10px;
         }
     </style>
 
 </head>
+
 <body>
 
 <div class="container">
+
     <h1>Patient Dashboard</h1>
 
+    <!-- PERSONAL INFO -->
     <div class="card">
-        <h3>Your Records</h3>
+        <h3 class="section-title">Your Personal Info</h3>
 
-        {% if files %}
-            <ul>
-                {% for file in files %}
-                    <li>
-                        <a href="/uploads/{{ file }}" class="file-link">
-                            {{ file }}
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
+        {% if patient %}
+            <p><b>Name:</b> {{ patient['name'] }}</p>
+            <p><b>Gender:</b> {{ patient['gender'] }}</p>
+            <p><b>DOB:</b> {{ patient['dob'] }}</p>
+            <p><b>Blood Group:</b> {{ patient['blood_group'] }}</p>
+            <p><b>Phone:</b> {{ patient['phone'] }}</p>
         {% else %}
-            <p class="empty">No records available.</p>
+            <p class="empty">No patient info found.</p>
         {% endif %}
-
-        <!-- Debug info (remove later) -->
-        <div class="debug">
-            Patient ID: {{ patient_id }}<br>
-            Files count: {{ files|length }}
-        </div>
-
     </div>
+
+    <!-- RECORDS -->
+    <div class="card">
+        <h3 class="section-title">Medical Records</h3>
+
+        {% if records %}
+        <table>
+            <tr>
+                <th>Doctor</th>
+                <th>File</th>
+                <th>Notes</th>
+                <th>Date</th>
+            </tr>
+
+            {% for r in records %}
+            <tr>
+                <td>{{ r['doctor_id'] }}</td>
+                <td>{{ r['file_name'] }}</td>
+                <td>{{ r['notes'] }}</td>
+                <td>{{ r['review_date'] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+            <p class="empty">No medical records available.</p>
+        {% endif %}
+    </div>
+
 </div>
 
 </body>

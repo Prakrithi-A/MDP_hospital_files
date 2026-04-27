@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Add Health Status</title>
+
+<style>
+body {
+    font-family: 'Segoe UI';
+    background: linear-gradient(to right, #E8F5E9, #A5D6A7);
+    padding: 30px;
+    text-align: center;
+}
+
+.card {
+    background: white;
+    width: 520px;
+    margin: 20px auto;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.2);
+}
+
+input, textarea, button {
+    width: 90%;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 8px;
+}
+
+button {
+    background: #43A047;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #2E7D32;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+td, th {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+.edit-btn {
+    background: #FFA000;
+    color: white;
+    padding: 5px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+h2 { color: #2E7D32; }
+
+.msg {
+    color: red;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Add Health Status</h2>
+
+<!-- SEARCH -->
+<div class="card">
+<form method="POST">
+    <input name="patient_id" placeholder="Enter Patient ID" required>
+    <button type="submit" name="search">Search</button>
+</form>
+</div>
+
+{% if message %}
+<div class="card msg">
+{{ message }}
+</div>
+{% endif %}
+
+<!-- HISTORY -->
+{% if history %}
+<div class="card">
+<h3>Health History</h3>
+
+<table>
+<tr>
+    <th>Doctor</th>
+    <th>Date</th>
+    <th>Notes</th>
+    <th>Action</th>
+</tr>
+
+{% for h in history %}
+<tr>
+    <td>{{ h['doctor_id'] }}</td>
+    <td>{{ h['review_date'] }}</td>
+    <td>{{ h['notes'] }}</td>
+    <td>
+
+        {% if h['doctor_id'] == session['user_id'] %}
+        <form method="POST">
+            <input type="hidden" name="health_id" value="{{ h['id'] }}">
+            <input type="text" name="notes" value="{{ h['notes'] }}">
+            <button class="edit-btn" name="edit_health">Edit</button>
+        </form>
+        {% else %}
+        -
+        {% endif %}
+
+    </td>
+</tr>
+{% endfor %}
+
+</table>
+</div>
+{% endif %}
+
+<!-- ADD -->
+{% if patient_id %}
+<div class="card">
+<h3>Add Health Status</h3>
+
+<form method="POST">
+
+    <input type="hidden" name="patient_id" value="{{ patient_id }}">
+
+    <input type="date" name="review_date" required>
+
+    <textarea name="notes" placeholder="Enter notes..." required></textarea>
+
+    <button type="submit" name="submit_health">Submit</button>
+
+</form>
+</div>
+{% endif %}
+
+</body>
+</html>

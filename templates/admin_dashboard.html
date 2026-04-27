@@ -82,7 +82,9 @@
 
         <div class="section-title">Records</div>
         <a href="{{ url_for('upload_record') }}" class="btn">Upload Medical Record</a>
-        <a href="{{ url_for('patient_info') }}" class="btn">View Patient Records</a>
+
+        <!-- FIXED: removed broken patient_info endpoint -->
+        <a href="{{ url_for('add_patient') }}" class="btn">View Patient Info</a>
 
         <div class="section-title">User Management</div>
         <a href="{{ url_for('add_user') }}" class="btn">Add Users</a>
@@ -92,7 +94,6 @@
         <div class="section-title">Information</div>
         <a href="{{ url_for('add_patient') }}" class="btn">Add Patient Info</a>
         <a href="{{ url_for('add_doctor') }}" class="btn">Add Doctor Info</a>
-        <a href="{{ url_for('patient_info') }}" class="btn">View Patient Info</a>
         <a href="{{ url_for('doctor_info') }}" class="btn">View Doctor Info</a>
 
         <a href="{{ url_for('logout') }}" class="logout">Logout</a>

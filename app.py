@@ -66,6 +66,14 @@ def init_db():
         review_date TEXT
     )""")
 
+    cur.execute("""CREATE TABLE IF NOT EXISTS health_status (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        doctor_id TEXT,
+        patient_id TEXT,
+        review_date TEXT,
+        notes TEXT
+    )""")
+
     conn.commit()
     conn.close()
 
@@ -131,10 +139,40 @@ def admin_dashboard():
 def doctor_dashboard():
     return render_template("doctor_dashboard.html")
 
-@app.route("/patient")
+@app.route("/patient_dashboard")
 @login_required("patient")
 def patient_dashboard():
-    return render_template("patient_dashboard.html")
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    patient_id = session["user_id"]
+
+    cur.execute("SELECT * FROM patient_info WHERE patient_id=?", (patient_id,))
+    patient = cur.fetchone()
+
+    cur.execute("""
+        SELECT doctor_id, file_name, notes, review_date
+        FROM records
+        WHERE patient_id=?
+        ORDER BY id DESC
+    """, (patient_id,))
+    records = cur.fetchall()
+
+    cur.execute("""
+        SELECT doctor_id, review_date, notes
+        FROM health_status
+        WHERE patient_id=?
+        ORDER BY id DESC
+    """, (patient_id,))
+    health = cur.fetchall()
+
+    conn.close()
+
+    return render_template("patient_dashboard.html",
+                           patient=patient,
+                           records=records,
+                           health=health)
 
 # ---------------- USER ----------------
 
@@ -211,88 +249,7 @@ def add_doctor():
         msg = "Doctor added"
     return render_template("add_doctor.html", message=msg)
 
-# ---------------- VIEW PATIENT (FIXED SEARCH) ----------------
-
-@app.route("/patient_info", methods=["GET", "POST"])
-@login_required("admin")
-def patient_info():
-    data = None
-    msg = ""
-
-    if request.method == "POST":
-        pid = request.form["patient_id"]
-
-        conn = get_db()
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM patient_info WHERE patient_id=?", (pid,))
-        data = cur.fetchone()
-        conn.close()
-
-        if not data:
-            msg = "Patient not found ❌"
-
-    return render_template("patient_info.html", data=data, message=msg)
-
-# ---------------- VIEW DOCTOR (FIXED SEARCH) ----------------
-
-@app.route("/doctor_info", methods=["GET", "POST"])
-@login_required("admin")
-def doctor_info():
-    data = None
-    msg = ""
-
-    if request.method == "POST":
-        did = request.form["doctor_id"]
-
-        conn = get_db()
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM doctor_info WHERE doctor_id=?", (did,))
-        data = cur.fetchone()
-        conn.close()
-
-        if not data:
-            msg = "Doctor not found ❌"
-
-    return render_template("doctor_info.html", data=data, message=msg)
-
-# ---------------- MAPPING ----------------
-
-@app.route("/mapping", methods=["GET", "POST"])
-@login_required("admin")
-def mapping():
-    msg = ""
-
-    conn = get_db()
-    cur = conn.cursor()
-
-    cur.execute("SELECT * FROM doctor_info")
-    doctors = cur.fetchall()
-
-    cur.execute("SELECT * FROM patient_info")
-    patients = cur.fetchall()
-
-    if request.method == "POST":
-        cur.execute(
-            "INSERT INTO doctor_patient_map VALUES (?, ?)",
-            (request.form["doctor_id"], request.form["patient_id"])
-        )
-        conn.commit()
-        msg = "Mapped successfully"
-
-    cur.execute("SELECT * FROM doctor_patient_map")
-    mappings = cur.fetchall()
-
-    conn.close()
-
-    return render_template(
-        "mapping.html",
-        doctors=doctors,
-        patients=patients,
-        mappings=mappings,
-        message=msg
-    )
-
-# ---------------- UPLOAD (FIXED ENDPOINT ERROR HERE) ----------------
+# ---------------- UPLOAD RECORD (FIXED ORDER) ----------------
 
 @app.route("/doctor/upload_record", methods=["GET", "POST"])
 @login_required("doctor")
@@ -300,13 +257,26 @@ def upload_record():
     msg = ""
 
     if request.method == "POST":
+
+        conn = get_db()
+        cur = conn.cursor()
+
+        # 🔐 CHECK mapping FIRST (important fix)
+        cur.execute("""
+            SELECT * FROM doctor_patient_map
+            WHERE doctor_id=? AND patient_id=?
+        """, (session["user_id"], request.form["patient_id"]))
+
+        if not cur.fetchone():
+            conn.close()
+            return "Not your patient ❌"
+
+        # 📁 NOW save file safely
         file = request.files["file"]
         filename = file.filename
         path = os.path.join(UPLOAD_FOLDER, filename)
         file.save(path)
 
-        conn = get_db()
-        cur = conn.cursor()
         cur.execute(
             "INSERT INTO records VALUES (NULL, ?, ?, ?, ?, ?, ?)",
             (
@@ -318,49 +288,19 @@ def upload_record():
                 request.form.get("review_date", "")
             )
         )
+
         conn.commit()
         conn.close()
-
         msg = "Uploaded successfully"
 
     return render_template("upload_record.html", message=msg)
 
-# ---------------- DOCTOR VIEW PATIENT ----------------
+# ---------------- VIEW RECORDS ----------------
 
-@app.route("/doctor/view_patient_info", methods=["GET", "POST"])
+@app.route("/doctor/view_records", methods=["GET", "POST"])
 @login_required("doctor")
-def view_patient_info():
-    patient = None
-    msg = ""
+def view_records():
 
-    if request.method == "POST":
-        pid = request.form["patient_id"]
-
-        conn = get_db()
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM patient_info WHERE patient_id=?", (pid,))
-        patient = cur.fetchone()
-        conn.close()
-
-        if not patient:
-            msg = "Not found"
-
-    return render_template("doctor_view_patient_info.html",
-                           patient=patient,
-                           message=msg)
-# -----------------LATEST FIX ----------
-@app.route("/doctors")
-@login_required("admin")
-def doctors():
-    conn = get_db()
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM doctor_info")
-    data = cur.fetchall()
-    conn.close()
-    return render_template("doctors.html", doctors=data)
-@app.route("/all_records", methods=["GET", "POST"])
-@login_required("admin")
-def all_records():
     records = []
     msg = ""
 
@@ -369,10 +309,22 @@ def all_records():
 
         conn = get_db()
         cur = conn.cursor()
+
         cur.execute("""
-            SELECT doctor_id, patient_id, file_name, notes, review_date
+            SELECT * FROM doctor_patient_map
+            WHERE doctor_id=? AND patient_id=?
+        """, (session["user_id"], pid))
+
+        if not cur.fetchone():
+            conn.close()
+            return render_template("view_records.html",
+                                   message="Not your patient ❌")
+
+        cur.execute("""
+            SELECT doctor_id, file_name, file_path, notes, review_date
             FROM records
             WHERE patient_id=?
+            ORDER BY id DESC
         """, (pid,))
 
         records = cur.fetchall()
@@ -381,9 +333,128 @@ def all_records():
         if not records:
             msg = "No records found ❌"
 
-    return render_template("all_records.html",
+    return render_template("view_records.html",
                            records=records,
                            message=msg)
+
+# ---------------- VIEW PATIENT INFO ----------------
+
+@app.route("/doctor/view_patient_info", methods=["GET", "POST"])
+@login_required("doctor")
+def view_patient_info():
+
+    patient = None
+    records = []
+    health = []
+
+    if request.method == "POST":
+        pid = request.form["patient_id"]
+
+        conn = get_db()
+        cur = conn.cursor()
+
+        cur.execute("""
+            SELECT * FROM doctor_patient_map
+            WHERE doctor_id=? AND patient_id=?
+        """, (session["user_id"], pid))
+
+        if not cur.fetchone():
+            conn.close()
+            return render_template("doctor_view_patient_info.html",
+                                   message="Not our patient ❌")
+
+        cur.execute("SELECT * FROM patient_info WHERE patient_id=?", (pid,))
+        patient = cur.fetchone()
+
+        cur.execute("SELECT * FROM records WHERE patient_id=?", (pid,))
+        records = cur.fetchall()
+
+        cur.execute("SELECT * FROM health_status WHERE patient_id=?", (pid,))
+        health = cur.fetchall()
+
+        conn.close()
+
+    return render_template("doctor_view_patient_info.html",
+                           patient=patient,
+                           records=records,
+                           health=health)
+
+# ---------------- ADD HEALTH STATUS ----------------
+
+@app.route("/doctor/add_health", methods=["GET", "POST"])
+@login_required("doctor")
+def add_health():
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    patient = None
+    history = []
+
+    if request.method == "POST":
+
+        if "search" in request.form:
+            pid = request.form["patient_id"]
+
+            cur.execute("""
+                SELECT * FROM doctor_patient_map
+                WHERE doctor_id=? AND patient_id=?
+            """, (session["user_id"], pid))
+
+            if not cur.fetchone():
+                conn.close()
+                return render_template("add_health.html",
+                                       message="Not our patient ❌")
+
+            cur.execute("SELECT * FROM patient_info WHERE patient_id=?", (pid,))
+            patient = cur.fetchone()
+
+            cur.execute("""
+                SELECT * FROM health_status
+                WHERE patient_id=?
+                ORDER BY id DESC
+            """, (pid,))
+            history = cur.fetchall()
+
+            conn.close()
+
+            return render_template("add_health.html",
+                                   patient=patient,
+                                   patient_id=pid,
+                                   history=history)
+
+        if "submit_health" in request.form:
+            pid = request.form["patient_id"]
+
+            cur.execute("""
+                INSERT INTO health_status (doctor_id, patient_id, review_date, notes)
+                VALUES (?, ?, ?, ?)
+            """, (
+                session["user_id"],
+                pid,
+                request.form["review_date"],
+                request.form["notes"]
+            ))
+
+            conn.commit()
+
+            cur.execute("""
+                SELECT * FROM health_status
+                WHERE patient_id=?
+                ORDER BY id DESC
+            """, (pid,))
+            history = cur.fetchall()
+
+            conn.close()
+
+            return render_template("add_health.html",
+                                   patient_id=pid,
+                                   history=history,
+                                   message="Updated ✔")
+
+    conn.close()
+    return render_template("add_health.html", patient=None, history=[], message="")
+
 # ---------------- INIT ----------------
 
 if __name__ == "__main__":
