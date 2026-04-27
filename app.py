@@ -578,7 +578,7 @@ def doctor_info():
     return render_template("doctor_info.html", data=data, message=msg)
 @app.route("/doctors")
 @login_required("admin")
-def view_doctors():
+def doctors():
     conn = get_db()
     cur = conn.cursor()
 
