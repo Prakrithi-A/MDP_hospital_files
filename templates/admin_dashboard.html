@@ -70,7 +70,6 @@
         .logout:hover {
             text-decoration: underline;
         }
-
     </style>
 </head>
 
@@ -82,13 +81,13 @@
     <div class="card">
 
         <div class="section-title">Records</div>
-        <a href="{{ url_for('upload') }}" class="btn">Upload Medical Record</a>
-        <a href="{{ url_for('patients') }}" class="btn">View Patient Records</a>
+        <a href="{{ url_for('upload_record') }}" class="btn">Upload Medical Record</a>
+        <a href="{{ url_for('patient_info') }}" class="btn">View Patient Records</a>
 
         <div class="section-title">User Management</div>
         <a href="{{ url_for('add_user') }}" class="btn">Add Users</a>
         <a href="{{ url_for('mapping') }}" class="btn">Doctor–Patient Mapping</a>
-        <a href="{{ url_for('doctors') }}" class="btn">Manage Doctors</a>
+        <a href="{{ url_for('doctor_info') }}" class="btn">Manage Doctors</a>
 
         <div class="section-title">Information</div>
         <a href="{{ url_for('add_patient') }}" class="btn">Add Patient Info</a>

@@ -8,7 +8,7 @@
             font-family: 'Segoe UI', sans-serif;
             margin: 0;
             background: linear-gradient(135deg, #E8F5E9, #C8E6C9, #A5D6A7);
-            height: 100vh;
+            min-height: 100vh;
         }
 
         .container {
@@ -18,36 +18,52 @@
 
         h1 {
             color: #1B5E20;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .card {
             background: white;
             padding: 30px;
             border-radius: 18px;
-            width: 420px;
+            width: 450px;
             margin: auto;
             box-shadow: 0px 10px 25px rgba(0,0,0,0.15);
+            text-align: left;
         }
 
-        select, input {
+        label {
+            font-weight: 600;
+            color: #2E7D32;
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 5px;
+        }
+
+        input {
             width: 100%;
             padding: 12px;
-            margin: 10px 0;
             border-radius: 10px;
             border: 1px solid #ccc;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: #66BB6A;
+            box-shadow: 0 0 5px #A5D6A7;
         }
 
         .btn {
-            margin-top: 15px;
+            margin-top: 20px;
             padding: 12px;
             width: 100%;
             border: none;
             border-radius: 10px;
             background: linear-gradient(to right, #66BB6A, #43A047);
             color: white;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
+            font-size: 15px;
         }
 
         .btn:hover {
@@ -57,8 +73,9 @@
         .message {
             margin-top: 15px;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             color: #2E7D32;
+            text-align: center;
         }
 
         .error {
@@ -70,7 +87,7 @@
             margin-top: 15px;
             color: #1B5E20;
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .back:hover {
@@ -88,20 +105,29 @@
 
         <form method="POST">
 
-            <select name="patient_id" required>
-                <option value="">Select Patient ID</option>
-                {% for id in patient_ids %}
-                    <option value="{{ id }}">{{ id }}</option>
-                {% endfor %}
-            </select>
+            <label>Patient ID</label>
+            <input type="text" name="patient_id" placeholder="e.g. PT1111" required>
 
-            <input type="text" name="name" placeholder="Full Name" required>
-            <input type="text" name="gender" placeholder="Gender" required>
+            <label>Full Name</label>
+            <input type="text" name="name" placeholder="Enter full name" required>
+
+            <label>Gender</label>
+            <input type="text" name="gender" placeholder="Male / Female / Other" required>
+
+            <label>Date of Birth</label>
             <input type="date" name="dob" required>
-            <input type="text" name="blood_group" placeholder="Blood Group">
-            <input type="text" name="phone" placeholder="Phone Number">
-            <input type="text" name="emergency_contact" placeholder="Emergency Contact">
-            <input type="text" name="relation" placeholder="Relation">
+
+            <label>Blood Group</label>
+            <input type="text" name="blood_group" placeholder="e.g. O+, A-, B+" required>
+
+            <label>Phone Number</label>
+            <input type="text" name="phone" placeholder="Enter phone number" required>
+
+            <label>Emergency Contact</label>
+            <input type="text" name="emergency_contact" placeholder="Emergency contact number">
+
+            <label>Relation</label>
+            <input type="text" name="relation" placeholder="e.g. Father, Mother">
 
             <button type="submit" class="btn">Add Patient</button>
 

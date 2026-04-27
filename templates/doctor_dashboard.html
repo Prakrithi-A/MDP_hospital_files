@@ -5,96 +5,78 @@
 
     <style>
         body {
-            font-family: 'Segoe UI';
+            font-family: 'Segoe UI', sans-serif;
             background: linear-gradient(to right, #E8F5E9, #A5D6A7);
             text-align: center;
+            padding: 40px;
         }
 
         .card {
             background: white;
-            padding: 25px;
-            margin: 30px auto;
-            width: 400px;
+            padding: 35px;
             border-radius: 15px;
-            box-shadow: 0px 5px 15px rgba(0,0,0,0.2);
+            width: 420px;
+            margin: auto;
+            box-shadow: 0px 6px 20px rgba(0,0,0,0.15);
         }
 
-        input, button {
-            width: 90%;
-            padding: 10px;
-            margin: 10px;
+        h2 {
+            color: #2E7D32;
+            margin-bottom: 25px;
         }
 
-        button {
-            background: #66BB6A;
-            color: white;
-            border: none;
-            border-radius: 8px;
-        }
-
-        button:hover {
-            background: #388E3C;
-        }
-
-        ul {
-            list-style: none;
-        }
-
-        a.file {
-            text-decoration: none;
-            background: #81C784;
+        a {
             display: block;
-            padding: 10px;
-            margin: 5px;
-            border-radius: 8px;
+            margin: 12px 0;
+            padding: 12px;
+            background: linear-gradient(to right, #66BB6A, #43A047);
             color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: 0.2s;
         }
 
-        a.file:hover {
-            background: #2E7D32;
+        a:hover {
+            background: linear-gradient(to right, #43A047, #2E7D32);
+            transform: scale(1.03);
         }
 
-        .error {
-            color: red;
+        .logout {
+            background: #C62828;
+        }
+
+        .logout:hover {
+            background: #8E0000;
+        }
+
+        .note {
+            font-size: 13px;
+            color: gray;
+            margin-top: 10px;
         }
     </style>
 </head>
 
 <body>
 
-<h2>Doctor Dashboard</h2>
-
-<div class="card">
-    <h3>Enter Patient ID</h3>
-
-    <form method="POST">
-        <input type="text" name="patient_id" placeholder="Enter Patient ID" required>
-        <button type="submit">View Records</button>
-    </form>
-</div>
-
 <div class="card">
 
-    {% if message %}
-        <p class="error">{{ message }}</p>
-    {% endif %}
+    <h2>Doctor Dashboard</h2>
 
-    {% if files %}
-        <h3>Patient Records</h3>
-        <ul>
-            {% for file in files %}
-                <li>
-                    <a href="/uploads/{{ file }}" class="file">
-                        {{ file }}
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+    <!-- FIXED ROUTES -->
+    <a href="/doctor/view_records">View Patient Records</a>
+    <a href="/doctor/add_health">Add Health Status</a>
+    <a href="/doctor/upload_record">Upload Records</a>
+    <a href="/doctor/view_patient_info">View Patient Info</a>
+
+    <a href="/logout" class="logout">Logout</a>
+
+    <div class="note">
+        Green Health System v1.0
+    </div>
 
 </div>
-
-<a href="/admin">← Back</a>
 
 </body>
 </html>

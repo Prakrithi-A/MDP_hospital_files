@@ -22,29 +22,14 @@
         h2 {
             text-align: center;
             color: #1B5E20;
-            margin-bottom: 20px;
         }
 
         .file {
             display: flex;
             justify-content: space-between;
-            align-items: center;
             padding: 10px;
             border-bottom: 1px solid #eee;
         }
-
-        .delete-btn {
-            color: white;
-            background: #E53935;
-            padding: 6px 10px;
-            border-radius: 6px;
-            text-decoration: none;
-        }
-
-        .delete-btn:hover {
-            background: #B71C1C;
-        }
-
     </style>
 </head>
 
@@ -57,9 +42,6 @@
     {% for file in files %}
         <div class="file">
             <span>{{ file }}</span>
-            <a href="{{ url_for('delete_file', filename=file) }}" class="delete-btn">
-                Delete
-            </a>
         </div>
     {% endfor %}
 

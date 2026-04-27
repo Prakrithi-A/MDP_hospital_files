@@ -5,35 +5,52 @@
 
     <style>
         body {
-            font-family: 'Segoe UI';
-            background: linear-gradient(to right, #E8F5E9, #A5D6A7);
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #E8F5E9, #C8E6C9, #A5D6A7);
+            margin: 0;
+            padding: 20px;
             text-align: center;
+        }
+
+        h2 {
+            color: #1B5E20;
+            margin-bottom: 20px;
         }
 
         .card {
             background: white;
             padding: 25px;
-            width: 420px;
-            margin: 30px auto;
+            width: 450px;
+            margin: 20px auto;
             border-radius: 15px;
-            box-shadow: 0px 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0px 8px 20px rgba(0,0,0,0.15);
         }
 
-        input, button {
-            width: 90%;
-            padding: 10px;
-            margin: 10px;
+        select, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 14px;
         }
 
         button {
-            background: #66BB6A;
+            background: linear-gradient(to right, #66BB6A, #43A047);
             color: white;
             border: none;
-            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
         }
 
         button:hover {
-            background: #388E3C;
+            background: linear-gradient(to right, #43A047, #2E7D32);
+        }
+
+        .msg {
+            font-weight: bold;
+            margin-top: 10px;
+            color: #2E7D32;
         }
 
         ul {
@@ -45,40 +62,78 @@
             background: #C8E6C9;
             margin: 8px;
             padding: 10px;
-            border-radius: 8px;
+            border-radius: 10px;
+            font-weight: 500;
         }
 
-        .msg {
+        .back {
+            display: inline-block;
+            margin-top: 15px;
+            text-decoration: none;
+            color: #1B5E20;
             font-weight: bold;
+        }
+
+        .back:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 
 <body>
 
-<h2>Doctor-Patient Mapping</h2>
+<h2>Doctor ↔ Patient Mapping</h2>
 
 <div class="card">
     <form method="POST">
-        <input name="doctor_id" placeholder="Doctor ID" required>
-        <input name="patient_id" placeholder="Patient ID" required>
-        <button type="submit">Add Mapping</button>
+
+        <!-- DOCTORS DROPDOWN -->
+        <select name="doctor_id" required>
+            <option value="">Select Doctor</option>
+            {% for d in doctors %}
+                <option value="{{ d['doctor_id'] }}">
+                    {{ d['doctor_id'] }} - {{ d['name'] }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <!-- PATIENTS DROPDOWN -->
+        <select name="patient_id" required>
+            <option value="">Select Patient</option>
+            {% for p in patients %}
+                <option value="{{ p['patient_id'] }}">
+                    {{ p['patient_id'] }} - {{ p['name'] }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Map Doctor → Patient</button>
     </form>
 
-    <p class="msg">{{ message }}</p>
+    {% if message %}
+        <div class="msg">{{ message }}</div>
+    {% endif %}
 </div>
 
 <div class="card">
-    <h3>Existing Mappings</h3>
+    <h3 style="color:#1B5E20;">Existing Mappings</h3>
 
-    <ul>
-        {% for d, p in mappings %}
-            <li>Doctor: {{ d }} → Patient: {{ p }}</li>
-        {% endfor %}
-    </ul>
+    {% if mappings %}
+        <ul>
+            {% for m in mappings %}
+                <li>
+                    Doctor: <b>{{ m['doctor_id'] }}</b>
+                    →
+                    Patient: <b>{{ m['patient_id'] }}</b>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No mappings found.</p>
+    {% endif %}
 </div>
 
-<a href="/admin">← Back</a>
+<a class="back" href="{{ url_for('admin_dashboard') }}">← Back to Dashboard</a>
 
 </body>
 </html>

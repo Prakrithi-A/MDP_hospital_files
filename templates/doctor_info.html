@@ -45,17 +45,6 @@
         h2 {
             color: #2E7D32;
         }
-
-        .message {
-            color: red;
-            margin-top: 10px;
-        }
-
-        .divider {
-            margin: 20px 0;
-            height: 1px;
-            background: #ddd;
-        }
     </style>
 </head>
 
@@ -63,35 +52,16 @@
 
 <div class="card">
 
-    <!-- 🔍 SEARCH -->
     <h2>Search Doctor</h2>
 
-    <form method="POST">
-        <input type="text" name="doctor_id" placeholder="Enter Doctor ID" required>
+    <!-- FIX: changed POST → GET -->
+    <form method="GET" action="{{ url_for('doctor_info') }}">
+        <input type="text" name="doctor_id" placeholder="Enter Doctor ID">
         <button type="submit">Search</button>
     </form>
 
     {% if message %}
-        <p class="message">{{ message }}</p>
-    {% endif %}
-
-    {% if data %}
-
-    <div class="divider"></div>
-
-    <h2>Edit Doctor Info</h2>
-
-    <form method="POST" action="{{ url_for('update_doctor', doctor_id=data['doctor_id']) }}">
-
-        <input type="text" name="name" value="{{ data['name'] }}" required>
-        <input type="text" name="specialization" value="{{ data['specialization'] }}" required>
-        <input type="text" name="experience" value="{{ data['experience'] }}" required>
-        <input type="text" name="phone" value="{{ data['phone'] }}">
-
-        <button type="submit">Update</button>
-
-    </form>
-
+        <p style="color:red">{{ message }}</p>
     {% endif %}
 
 </div>

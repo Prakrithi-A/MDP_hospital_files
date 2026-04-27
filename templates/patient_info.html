@@ -20,7 +20,7 @@
             box-shadow: 0px 8px 25px rgba(0,0,0,0.15);
         }
 
-        input, select {
+        input {
             width: 90%;
             padding: 10px;
             margin: 8px 0;
@@ -44,25 +44,6 @@
 
         h2 {
             color: #2E7D32;
-            margin-bottom: 10px;
-        }
-
-        .message {
-            color: red;
-            margin-top: 10px;
-            font-weight: 500;
-        }
-
-        .success {
-            color: green;
-            margin-top: 10px;
-            font-weight: 500;
-        }
-
-        .divider {
-            margin: 20px 0;
-            height: 1px;
-            background: #ddd;
         }
     </style>
 </head>
@@ -71,60 +52,16 @@
 
 <div class="card">
 
-    <!-- 🔍 SEARCH -->
     <h2>Search Patient</h2>
 
-    <form method="POST">
-        <input type="text" name="patient_id" placeholder="Enter Patient ID" required>
+    <!-- FIX: changed POST → GET -->
+    <form method="GET" action="{{ url_for('patient_info') }}">
+        <input type="text" name="patient_id" placeholder="Enter Patient ID">
         <button type="submit">Search</button>
     </form>
 
-    <!-- ❌ ERROR MESSAGE -->
     {% if message %}
-        <p class="message">{{ message }}</p>
-    {% endif %}
-
-    <!-- 🧾 SHOW DATA -->
-    {% if data %}
-
-    <div class="divider"></div>
-
-    <h2>Edit Patient Info</h2>
-
-    <form method="POST" action="{{ url_for('update_patient', patient_id=data['patient_id']) }}">
-
-        <input type="text" name="name" value="{{ data['name'] }}" required>
-
-        <select name="gender">
-            <option value="Male" {{ 'selected' if data['gender']=='Male' else '' }}>Male</option>
-            <option value="Female" {{ 'selected' if data['gender']=='Female' else '' }}>Female</option>
-            <option value="Other" {{ 'selected' if data['gender']=='Other' else '' }}>Other</option>
-        </select>
-
-        <input type="date" name="dob" value="{{ data['dob'] }}" required>
-
-        <select name="blood_group">
-            <option value="A+" {{ 'selected' if data['blood_group']=='A+' else '' }}>A+</option>
-            <option value="B+" {{ 'selected' if data['blood_group']=='B+' else '' }}>B+</option>
-            <option value="O+" {{ 'selected' if data['blood_group']=='O+' else '' }}>O+</option>
-            <option value="AB+" {{ 'selected' if data['blood_group']=='AB+' else '' }}>AB+</option>
-        </select>
-
-        <input type="text" name="phone" value="{{ data['phone'] }}">
-        <input type="text" name="emergency_contact" value="{{ data['emergency_contact'] }}">
-
-        <select name="relation">
-            <option value="Spouse" {{ 'selected' if data['relation']=='Spouse' else '' }}>Spouse</option>
-            <option value="Parent" {{ 'selected' if data['relation']=='Parent' else '' }}>Parent</option>
-            <option value="Family" {{ 'selected' if data['relation']=='Family' else '' }}>Family</option>
-            <option value="Friend" {{ 'selected' if data['relation']=='Friend' else '' }}>Friend</option>
-            <option value="Other" {{ 'selected' if data['relation']=='Other' else '' }}>Other</option>
-        </select>
-
-        <button type="submit">Update</button>
-
-    </form>
-
+        <p style="color:red">{{ message }}</p>
     {% endif %}
 
 </div>

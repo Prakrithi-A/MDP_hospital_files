@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Patient Info</title>
+
+<style>
+body {
+    font-family: 'Segoe UI';
+    background: linear-gradient(to right, #E8F5E9, #A5D6A7);
+    padding: 30px;
+    text-align: center;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    margin: 20px auto;
+    width: 500px;
+    border-radius: 15px;
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.2);
+}
+
+input, button {
+    padding: 10px;
+    margin: 10px;
+    width: 80%;
+}
+
+button {
+    background: #66BB6A;
+    color: white;
+    border: none;
+    border-radius: 8px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+td, th {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+</style>
+</head>
+
+<body>
+
+<h2>View Patient Info</h2>
+
+<div class="card">
+<form method="POST">
+    <input name="patient_id" placeholder="Enter Patient ID" required>
+    <button type="submit">Search</button>
+</form>
+
+<p>{{ message }}</p>
+</div>
+
+{% if patient %}
+<div class="card">
+<h3>Patient Details</h3>
+<p><b>Name:</b> {{ patient['name'] }}</p>
+<p><b>Gender:</b> {{ patient['gender'] }}</p>
+<p><b>DOB:</b> {{ patient['dob'] }}</p>
+<p><b>Blood Group:</b> {{ patient['blood_group'] }}</p>
+</div>
+{% endif %}
+
+{% if health %}
+<div class="card">
+<h3>Health Records</h3>
+<table>
+<tr><th>Doctor</th><th>Date</th><th>Notes</th></tr>
+{% for h in health %}
+<tr>
+<td>{{ h['doctor_id'] }}</td>
+<td>{{ h['review_date'] }}</td>
+<td>{{ h['notes'] }}</td>
+</tr>
+{% endfor %}
+</table>
+</div>
+{% endif %}
+
+{% if records %}
+<div class="card">
+<h3>Files</h3>
+<table>
+<tr><th>Doctor</th><th>File</th></tr>
+{% for r in records %}
+<tr>
+<td>{{ r['doctor_id'] }}</td>
+<td>{{ r['file_name'] }}</td>
+</tr>
+{% endfor %}
+</table>
+</div>
+{% endif %}
+
+</body>
+</html>
