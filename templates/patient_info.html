@@ -15,12 +15,12 @@
             background: white;
             padding: 30px;
             border-radius: 18px;
-            width: 420px;
+            width: 450px;
             margin: auto;
             box-shadow: 0px 8px 25px rgba(0,0,0,0.15);
         }
 
-        input {
+        input, select {
             width: 90%;
             padding: 10px;
             margin: 8px 0;
@@ -30,7 +30,7 @@
 
         button {
             padding: 10px 20px;
-            background: #66BB6A;
+            background: #43A047;
             color: white;
             border: none;
             border-radius: 8px;
@@ -39,11 +39,30 @@
         }
 
         button:hover {
-            background: #388E3C;
+            background: #2E7D32;
         }
 
         h2 {
-            color: #2E7D32;
+            color: #1B5E20;
+        }
+
+        .divider {
+            margin: 20px 0;
+            height: 1px;
+            background: #ddd;
+        }
+
+        .box {
+            text-align: left;
+            background: #F1F8E9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .msg {
+            color: red;
+            font-weight: 500;
         }
     </style>
 </head>
@@ -54,14 +73,31 @@
 
     <h2>Search Patient</h2>
 
-    <!-- FIX: changed POST → GET -->
-    <form method="GET" action="{{ url_for('patient_info') }}">
-        <input type="text" name="patient_id" placeholder="Enter Patient ID">
+    <form method="POST">
+        <input type="text" name="patient_id" placeholder="Enter Patient ID" required>
         <button type="submit">Search</button>
     </form>
 
     {% if message %}
-        <p style="color:red">{{ message }}</p>
+        <p class="msg">{{ message }}</p>
+    {% endif %}
+
+    {% if data %}
+    <div class="divider"></div>
+
+    <h2>Patient Details</h2>
+
+    <div class="box">
+        <p><b>ID:</b> {{ data['patient_id'] }}</p>
+        <p><b>Name:</b> {{ data['name'] }}</p>
+        <p><b>Gender:</b> {{ data['gender'] }}</p>
+        <p><b>DOB:</b> {{ data['dob'] }}</p>
+        <p><b>Blood Group:</b> {{ data['blood_group'] }}</p>
+        <p><b>Phone:</b> {{ data['phone'] }}</p>
+        <p><b>Emergency Contact:</b> {{ data['emergency_contact'] }}</p>
+        <p><b>Relation:</b> {{ data['relation'] }}</p>
+    </div>
+
     {% endif %}
 
 </div>
