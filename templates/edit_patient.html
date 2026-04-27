@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Patient</title>
+</head>
+<body>
+
+<h2>Edit Patient</h2>
+
+<form method="POST">
+
+    <input name="name" value="{{ patient['name'] }}" required>
+    <input name="gender" value="{{ patient['gender'] }}" required>
+    <input name="dob" value="{{ patient['dob'] }}" required>
+    <input name="blood_group" value="{{ patient['blood_group'] }}" required>
+    <input name="phone" value="{{ patient['phone'] }}" required>
+    <input name="emergency_contact" value="{{ patient['emergency_contact'] }}" required>
+    <input name="relation" value="{{ patient['relation'] }}" required>
+
+    <button type="submit">Update</button>
+</form>
+
+<p style="color:green;">{{ message }}</p>
+
+</body>
+</html>

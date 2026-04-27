@@ -474,6 +474,51 @@ def patient_info():
             msg = "Patient not found ❌"
 
     return render_template("patient_info.html", data=data, message=msg)
+@app.route("/edit_patient/<patient_id>", methods=["GET", "POST"])
+@login_required("admin")
+def edit_patient(patient_id):
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    # Fetch existing patient
+    cur.execute("SELECT * FROM patient_info WHERE patient_id=?", (patient_id,))
+    patient = cur.fetchone()
+
+    if not patient:
+        conn.close()
+        return "Patient not found ❌", 404
+
+    msg = ""
+
+    if request.method == "POST":
+
+        cur.execute("""
+            UPDATE patient_info
+            SET name=?, gender=?, dob=?, blood_group=?,
+                phone=?, emergency_contact=?, relation=?
+            WHERE patient_id=?
+        """, (
+            request.form["name"],
+            request.form["gender"],
+            request.form["dob"],
+            request.form["blood_group"],
+            request.form["phone"],
+            request.form["emergency_contact"],
+            request.form["relation"],
+            patient_id
+        ))
+
+        conn.commit()
+        msg = "Updated successfully ✔"
+
+        # refresh data after update
+        cur.execute("SELECT * FROM patient_info WHERE patient_id=?", (patient_id,))
+        patient = cur.fetchone()
+
+    conn.close()
+
+    return render_template("edit_patient.html", patient=patient, message=msg)
 
 # ---------------- MAPPING ----------------
 
