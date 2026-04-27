@@ -576,7 +576,18 @@ def doctor_info():
             msg = "Doctor not found ❌"
 
     return render_template("doctor_info.html", data=data, message=msg)
+@app.route("/doctors")
+@login_required("admin")
+def view_doctors():
+    conn = get_db()
+    cur = conn.cursor()
 
+    cur.execute("SELECT * FROM doctor_info")
+    doctors = cur.fetchall()
+
+    conn.close()
+
+    return render_template("doctors.html", doctors=doctors)
 # ---------------- INIT ----------------
 
 if __name__ == "__main__":
