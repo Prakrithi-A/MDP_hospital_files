@@ -2,36 +2,49 @@
 <html>
 <head>
     <title>Hospital Login</title>
-
     <style>
         body {
             margin: 0;
             font-family: 'Segoe UI', sans-serif;
-            background-image: url("/static/images/login_image.jpeg");
+            background-image: url("/static/login_image.jpeg");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            height: 100vh;
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(to right, #E8F5E9, #A5D6A7);
-            height: 100vh;
-            margin: 0;
+            background-attachment: fixed;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
+        }
+
+        /* Optional: subtle overlay so the form is readable */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(232, 245, 233, 0.4); /* light green tint */
+            z-index: 0;
         }
 
         .container {
-            background: white;
+            background: rgba(185, 236, 230, 0.95);
             padding: 30px;
             border-radius: 15px;
             width: 380px;
             box-shadow: 0px 6px 20px rgba(0,0,0,0.15);
+            backdrop-filter: blur(6px); /* glass effect */
+            position: relative;
+            z-index: 1;
         }
 
         h2 {
             text-align: center;
             color: #2E7D32;
+            margin-top: 0;
         }
 
         input, select {
@@ -40,6 +53,7 @@
             margin: 8px 0 15px 0;
             border-radius: 8px;
             border: 1px solid #ccc;
+            box-sizing: border-box;
         }
 
         button {
@@ -47,9 +61,10 @@
             padding: 12px;
             background: #66BB6A;
             border: none;
-            color: white;
+            color: rgb(211, 243, 228);
             border-radius: 8px;
             cursor: pointer;
+            font-size: 16px;
         }
 
         button:hover {
@@ -59,31 +74,22 @@
 </head>
 
 <body>
-
-<div class="container">
-
-    <h2>Hospital Login</h2>
-
-    <form method="POST" action="/login">
-
-        <select name="role" required>
-            <option value="">Select Role</option>
-            <option value="admin">Admin</option>
-            <option value="doctor">Doctor</option>
-            <option value="patient">Patient</option>
-            <option value="external">External</option>
-        </select>
-
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="text" name="user_id" placeholder="User ID" required>
-        <input type="text" name="phone" placeholder="Phone Number" required>
-        <input type="password" name="password" placeholder="Password" required>
-
-        <button type="submit">Login</button>
-
-    </form>
-
-</div>
-
+    <div class="container">
+        <h2>BE FIT HEALTH CARE</h2>
+        <form method="POST" action="/login">
+            <select name="role" required>
+                <option value="">Select Role</option>
+                <option value="admin">Admin</option>
+                <option value="doctor">Doctor</option>
+                <option value="patient">Patient</option>
+                <option value="external">External</option>
+            </select>
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="text" name="user_id" placeholder="User ID" required>
+            <input type="text" name="phone" placeholder="Phone Number" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
 </body>
 </html>
