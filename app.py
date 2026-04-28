@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, abort
 import sqlite3
 import os
 from functools import wraps
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
@@ -130,6 +131,39 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for("home"))
+
+# ---------------- SECURE FILE DOWNLOAD ----------------
+
+@app.route("/uploads/<filename>")
+@login_required()
+def download_file(filename):
+    filename = secure_filename(filename)  # prevent path traversal
+    conn = get_db()
+    cur = conn.cursor()
+    
+    # Check if user has access to this file
+    if session["role"] == "admin":
+        cur.execute("SELECT 1 FROM records WHERE file_name=?", (filename,))
+    elif session["role"] == "doctor":
+        cur.execute("""
+            SELECT 1 FROM records r 
+            JOIN doctor_patient_map m ON r.patient_id = m.patient_id 
+            WHERE r.file_name=? AND m.doctor_id=?
+        """, (filename, session["user_id"]))
+    elif session["role"] == "patient":
+        cur.execute("SELECT 1 FROM records WHERE file_name=? AND patient_id=?", 
+                   (filename, session["user_id"]))
+    else:
+        conn.close()
+        abort(403)
+    
+    allowed = cur.fetchone()
+    conn.close()
+    
+    if not allowed:
+        return "Access Denied!", 403
+        
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 # ---------------- DASHBOARDS ----------------
 
@@ -275,7 +309,7 @@ def upload_record():
             return "Kindly note that they are not your patient"
 
         file = request.files["file"]
-        filename = file.filename
+        filename = secure_filename(file.filename)  # sanitize filename
         path = os.path.join(UPLOAD_FOLDER, filename)
         file.save(path)
 
