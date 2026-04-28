@@ -19,7 +19,6 @@ def get_db():
     conn.row_factory = sqlite3.Row
     return conn
 
-
 def init_db():
     conn = get_db()
     cur = conn.cursor()
@@ -86,14 +85,19 @@ def login_required(role=None):
             if "role" not in session:
                 return redirect(url_for("login"))
             if role and session["role"] != role:
-                return "Access Denied ❌", 403
+                return "Access Denied!", 403
             return f(*args, **kwargs)
         return decorated
     return wrapper
 
+# ---------------- HOME ----------------
+
+@app.route("/")
+def home():
+    return render_template("home.html")
+
 # ---------------- LOGIN ----------------
 
-@app.route("/", methods=["GET", "POST"])
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
@@ -113,7 +117,7 @@ def login():
     conn.close()
 
     if not user:
-        return "Invalid credentials ❌"
+        return "Invalid credentials"
 
     session["role"] = role
     session["user_id"] = uid
@@ -125,7 +129,7 @@ def login():
 @app.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for("login"))
+    return redirect(url_for("home"))
 
 # ---------------- DASHBOARDS ----------------
 
@@ -268,7 +272,7 @@ def upload_record():
 
         if not cur.fetchone():
             conn.close()
-            return "Not your patient ❌"
+            return "Kindly note that they are not your patient"
 
         file = request.files["file"]
         filename = file.filename
@@ -316,7 +320,7 @@ def view_records():
         if not cur.fetchone():
             conn.close()
             return render_template("view_records.html",
-                                   message="Not your patient ❌")
+                                   message="Not your patient")
 
         cur.execute("""
             SELECT doctor_id, file_name, file_path, notes, review_date
@@ -329,7 +333,7 @@ def view_records():
         conn.close()
 
         if not records:
-            msg = "No records found ❌"
+            msg = "No records found"
 
     return render_template("view_records.html",
                            records=records,
@@ -359,7 +363,7 @@ def view_patient_info():
         if not cur.fetchone():
             conn.close()
             return render_template("doctor_view_patient_info.html",
-                                   message="Not our patient ❌")
+                                   message="Not our patient")
 
         cur.execute("SELECT * FROM patient_info WHERE patient_id=?", (pid,))
         patient = cur.fetchone()
@@ -402,7 +406,7 @@ def add_health():
             if not cur.fetchone():
                 conn.close()
                 return render_template("add_health.html",
-                                       message="Not our patient ❌")
+                                       message="Not our patient")
 
             cur.execute("SELECT * FROM patient_info WHERE patient_id=?", (pid,))
             patient = cur.fetchone()
@@ -471,9 +475,10 @@ def patient_info():
         conn.close()
 
         if not data:
-            msg = "Patient not found ❌"
+            msg = "Patient not found"
 
     return render_template("patient_info.html", data=data, message=msg)
+
 @app.route("/edit_patient/<patient_id>", methods=["GET", "POST"])
 @login_required("admin")
 def edit_patient(patient_id):
@@ -487,7 +492,7 @@ def edit_patient(patient_id):
 
     if not patient:
         conn.close()
-        return "Patient not found ❌", 404
+        return "Patient not found", 404
 
     msg = ""
 
@@ -573,9 +578,10 @@ def doctor_info():
         conn.close()
 
         if not data:
-            msg = "Doctor not found ❌"
+            msg = "Doctor not found"
 
     return render_template("doctor_info.html", data=data, message=msg)
+
 @app.route("/doctors")
 @login_required("admin")
 def doctors():
@@ -588,6 +594,7 @@ def doctors():
     conn.close()
 
     return render_template("doctors.html", doctors=doctors)
+
 # ---------------- INIT ----------------
 
 if __name__ == "__main__":
