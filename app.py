@@ -1,11 +1,19 @@
-from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, abort
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, abort, Response
 import sqlite3
 import os
 from functools import wraps
 from werkzeug.utils import secure_filename
+from cryptography.fernet import Fernet
+import base64
+import hashlib
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
+
+def get_fernet():
+    # derive 32-byte key from Flask secret key
+    key = hashlib.sha256(app.secret_key.encode()).digest()
+    return Fernet(base64.urlsafe_b64encode(key))
 
 DB_FILE = "hospital.db"
 UPLOAD_FOLDER = "uploads"
@@ -137,33 +145,56 @@ def logout():
 @app.route("/uploads/<filename>")
 @login_required()
 def download_file(filename):
-    filename = secure_filename(filename)  # prevent path traversal
+    filename = secure_filename(filename)
     conn = get_db()
     cur = conn.cursor()
     
+    # Get file path from DB and check access
+    cur.execute("SELECT file_path, patient_id FROM records WHERE file_name=?", (filename,))
+    record = cur.fetchone()
+    
+    if not record:
+        conn.close()
+        abort(404)
+    
+    file_path = record["file_path"]
+    file_patient_id = record["patient_id"]
+    
     # Check if user has access to this file
+    allowed = False
     if session["role"] == "admin":
-        cur.execute("SELECT 1 FROM records WHERE file_name=?", (filename,))
+        allowed = True
     elif session["role"] == "doctor":
         cur.execute("""
-            SELECT 1 FROM records r 
-            JOIN doctor_patient_map m ON r.patient_id = m.patient_id 
-            WHERE r.file_name=? AND m.doctor_id=?
-        """, (filename, session["user_id"]))
+            SELECT 1 FROM doctor_patient_map 
+            WHERE doctor_id=? AND patient_id=?
+        """, (session["user_id"], file_patient_id))
+        allowed = cur.fetchone() is not None
     elif session["role"] == "patient":
-        cur.execute("SELECT 1 FROM records WHERE file_name=? AND patient_id=?", 
-                   (filename, session["user_id"]))
-    else:
-        conn.close()
-        abort(403)
+        allowed = file_patient_id == session["user_id"]
     
-    allowed = cur.fetchone()
     conn.close()
     
     if not allowed:
         return "Access Denied!", 403
+    
+    # Decrypt and return file
+    try:
+        fernet = get_fernet()
+        with open(file_path, "rb") as f:
+            encrypted_data = f.read()
         
-    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
+        decrypted_data = fernet.decrypt(encrypted_data)
+        
+        return Response(
+            decrypted_data,
+            headers={
+                "Content-Disposition": f"inline; filename={filename}",
+                "Content-Type": "application/octet-stream"
+            }
+        )
+    except Exception as e:
+        return f"Error decrypting file: {e}", 500
 
 # ---------------- DASHBOARDS ----------------
 
@@ -309,9 +340,15 @@ def upload_record():
             return "Kindly note that they are not your patient"
 
         file = request.files["file"]
-        filename = secure_filename(file.filename)  # sanitize filename
+        filename = secure_filename(file.filename)
         path = os.path.join(UPLOAD_FOLDER, filename)
-        file.save(path)
+        
+        fernet = get_fernet()
+        file_data = file.read()
+        encrypted_data = fernet.encrypt(file_data)
+
+        with open(path, "wb") as f:
+            f.write(encrypted_data)
 
         cur.execute(
             "INSERT INTO records VALUES (NULL, ?, ?, ?, ?, ?, ?)",
