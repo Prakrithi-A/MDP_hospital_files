@@ -3,12 +3,17 @@
 <head>
     <title>Hospital System</title>
     <style>
-        body {
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
             font-family: 'Segoe UI', sans-serif;
             background-image: url("/static/home.jpeg");
             background-size: cover;
-            background-position: center;
+            background-position: center center;
             background-repeat: no-repeat;
             background-attachment: fixed;
             min-height: 100vh;
@@ -16,14 +21,27 @@
             justify-content: center;
             align-items: center;
             position: relative;
+            overflow: hidden;
+            animation: slowZoom 25s ease-in-out infinite alternate;
+        }
+
+        @keyframes slowZoom {
+            from { background-size: 100% auto; }
+            to { background-size: 110% auto; }
         }
 
         body::before {
             content: "";
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.55);
             z-index: 0;
+            animation: breathe 10s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { background: rgba(0, 0, 0, 0.55); }
+            50% { background: rgba(0, 0, 0, 0.45); }
         }
 
         .card {
@@ -31,36 +49,94 @@
             z-index: 1;
             text-align: center;
             color: white;
-            padding: 40px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 15px;
-            backdrop-filter: blur(4px);
+            padding: 50px 40px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            animation: fadeSlideUp 1.2s ease-out;
+            max-width: 600px;
+        }
+
+        @keyframes fadeSlideUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(40px) scale(0.95); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
         }
 
         h1 {
-            font-size: 40px;
-            margin-bottom: 10px;
+            font-size: 42px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            text-shadow: 0 3px 15px rgba(0,0,0,0.6);
+            animation: textGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes textGlow {
+            0%, 100% { text-shadow: 0 3px 15px rgba(0,0,0,0.6); }
+            50% { text-shadow: 0 3px 25px rgba(67, 160, 71, 0.4); }
         }
 
         p {
             font-size: 18px;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
+            opacity: 0.9;
+            letter-spacing: 0.5px;
+            animation: fadeIn 1.8s ease-out 0.3s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 0.9; }
         }
 
         .btn {
-            padding: 12px 25px;
-            background: #43A047;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #43A047, #388E3C);
             color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 16px;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 500;
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(67, 160, 71, 0.5);
+            animation: fadeIn 2s ease-out 0.6s both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn:hover {
-            background: #2E7D32;
+            background: linear-gradient(135deg, #2E7D32, #1B5E20);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(67, 160, 71, 0.7);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
         }
     </style>
 </head>
