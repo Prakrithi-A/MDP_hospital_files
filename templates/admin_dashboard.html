@@ -7,37 +7,57 @@
         body {
             font-family: 'Segoe UI', sans-serif;
             margin: 0;
-            background: linear-gradient(135deg, #E8F5E9, #C8E6C9, #A5D6A7);
-            height: 100vh;
+            background-image: url("/static/dash.jpeg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Optional: light overlay so cards pop */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: rgba(232, 245, 233, 0.3); /* lighter so bg shows through */
+            z-index: 0;
         }
 
         .container {
             padding: 40px;
             text-align: center;
+            position: relative;
+            z-index: 1;
         }
 
         h1 {
             color: #1B5E20;
             margin-bottom: 25px;
             letter-spacing: 1px;
+            text-shadow: 0px 1px 2px rgba(255,255,255,0.6);
         }
 
         .card {
-            background: #ffffff;
+            background: rgba(152, 251, 152, 0.3); /* #98FB98 pale green, see-through */
             padding: 30px;
             border-radius: 18px;
             width: 420px;
             margin: auto;
             box-shadow: 0px 12px 30px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(12px); /* glass effect */
+            border: 1px solid rgba(255, 255, 255, 0.4);
         }
 
         .section-title {
             margin-top: 20px;
             font-size: 13px;
-            color: #2E7D32;
+            color: #1B5E20; /* darker green for contrast */
             text-transform: uppercase;
             letter-spacing: 1.2px;
-            font-weight: 600;
+            font-weight: 700;
+            text-shadow: 0px 1px 2px rgba(255,255,255,0.5);
         }
 
         .btn {
@@ -65,6 +85,7 @@
             font-size: 14px;
             text-decoration: none;
             font-weight: 600;
+            text-shadow: 0px 1px 2px rgba(255,255,255,0.5);
         }
 
         .logout:hover {
@@ -74,34 +95,26 @@
 </head>
 
 <body>
+    <div class="container">
+        <h1>Admin Dashboard</h1>
 
-<div class="container">
-    <h1>Admin Dashboard</h1>
+        <div class="card">
+            <div class="section-title">Records</div>
+            
+            <a href="{{ url_for('patient_info') }}" class="btn">View Patient Info</a>
 
-    <div class="card">
+            <div class="section-title">User Management</div>
+            <a href="{{ url_for('add_user') }}" class="btn">Add Users</a>
+            <a href="{{ url_for('mapping') }}" class="btn">Doctor–Patient Mapping</a>
+            <a href="{{ url_for('doctors') }}" class="btn">Manage Doctors</a>
 
-        <div class="section-title">Records</div>
-        <a href="{{ url_for('upload_record') }}" class="btn">Upload Medical Record</a>
+            <div class="section-title">Information</div>
+            <a href="{{ url_for('add_patient') }}" class="btn">Add Patient Info</a>
+            <a href="{{ url_for('add_doctor') }}" class="btn">Add Doctor Info</a>
+            <a href="{{ url_for('doctor_info') }}" class="btn">View Doctor Info</a>
 
-        <!-- FIXED: removed broken patient_info endpoint -->
-        <a href="{{ url_for('patient_info') }}" class="btn">
-    View Patient Info
-</a>
-
-        <div class="section-title">User Management</div>
-        <a href="{{ url_for('add_user') }}" class="btn">Add Users</a>
-        <a href="{{ url_for('mapping') }}" class="btn">Doctor–Patient Mapping</a>
-        <a href="{{ url_for('doctors') }}" class= "btn">Manage Doctors</a>
-
-        <div class="section-title">Information</div>
-        <a href="{{ url_for('add_patient') }}" class="btn">Add Patient Info</a>
-        <a href="{{ url_for('add_doctor') }}" class="btn">Add Doctor Info</a>
-        <a href="{{ url_for('doctor_info') }}" class="btn">View Doctor Info</a>
-
-        <a href="{{ url_for('logout') }}" class="logout">Logout</a>
-
+            <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+        </div>
     </div>
-</div>
-
 </body>
 </html>

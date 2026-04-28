@@ -6,59 +6,102 @@
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(to right, #E8F5E9, #A5D6A7);
             margin: 0;
+            background-image: url("/static/general.jpeg"); /* same bg as admin */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Light overlay so cards stay readable */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: rgba(232, 245, 233, 0.25);
+            z-index: 0;
         }
 
         .container {
             padding: 30px;
             text-align: center;
+            position: relative;
+            z-index: 1;
         }
 
         h1 {
-            color: #2E7D32;
+            color: #1B5E20;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-shadow: 0px 1px 2px rgba(255,255,255,0.6);
         }
 
         .card {
-            background: white;
+            background: rgba(152, 251, 152, 0.3); /* #98FB98 pale green, see-through */
             padding: 25px;
             margin: 20px auto;
             width: 500px;
             border-radius: 15px;
             box-shadow: 0px 6px 20px rgba(0,0,0,0.15);
+            backdrop-filter: blur(12px); /* glass effect */
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: #1B5E20;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         th, td {
             padding: 10px;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid rgba(46, 125, 50, 0.2);
             text-align: center;
+            color: #1B5E20;
         }
 
         th {
-            background: #C8E6C9;
+            background: rgba(200, 230, 201, 0.8); /* semi-transparent header */
+            font-weight: 600;
+        }
+
+        tr:hover td {
+            background: rgba(200, 230, 201, 0.4);
         }
 
         .empty {
-            color: #666;
+            color: #1B5E20;
+            font-weight: 500;
+            text-shadow: 0px 1px 2px rgba(255,255,255,0.5);
         }
 
         .section-title {
+            color: #1B5E20;
+            margin-bottom: 15px;
+            margin-top: 0;
+            font-weight: 700;
+            text-shadow: 0px 1px 2px rgba(255,255,255,0.6);
+        }
+
+        p {
+            margin: 8px 0;
+            font-size: 15px;
+        }
+
+        b {
             color: #2E7D32;
-            margin-bottom: 10px;
         }
     </style>
-
 </head>
 
 <body>
-
 <div class="container">
-
     <h1>Patient Dashboard</h1>
 
     <!-- PERSONAL INFO -->
@@ -102,8 +145,6 @@
             <p class="empty">No medical records available.</p>
         {% endif %}
     </div>
-
 </div>
-
 </body>
 </html>
